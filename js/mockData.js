@@ -24,7 +24,7 @@ function initializeMockData() {
             id: 1,
             name: 'Administrador Sistema',
             email: 'admin@pascualbravo.edu.co',
-            password: 'admin123', // En producción esto estaría hasheado
+            password: 'admin123', 
             role: 'admin',
             phone: '3001234567',
             date_joined: new Date().toISOString()

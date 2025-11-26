@@ -7,15 +7,19 @@
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="auth-page">
+
+<body class="auth-page" 
+      style="background: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)),
+      url('img/fondoLogin.jpg') no-repeat center center fixed; 
+      background-size: cover;"> 
+
     <div class="auth-container">
         <div class="auth-box">
             <div class="auth-header">
-                <img src="assets/logo.png" alt="Pascual Bravo" class="auth-logo">
-                <h1 class="auth-title">Iniciar Sesión</h1>
+                <img src="img/LogoPascual.png" alt="Pascual Bravo" class="auth-logo">
                 <p class="auth-subtitle">Accede a tu cuenta del sistema de prácticas</p>
             </div>
-
+            
             <form id="loginForm" class="auth-form">
                 <div class="form-group">
                     <label for="email" class="form-label">Correo Electrónico</label>
@@ -43,24 +47,11 @@
                     <span>¿No tienes cuenta?</span>
                 </div>
 
-                <a href="register.html" class="btn btn-secondary btn-block">
-                    Crear una cuenta
-                </a>
-
-                <a href="index.html" class="btn btn-text btn-block">
-                    Volver al inicio
-                </a>
+                <a href="register.html" class="btn btn-secondary btn-block">Crear una cuenta</a>
+                <a href="index.html" class="btn btn-text btn-block">Volver al inicio</a>
             </form>
 
-            <!-- Credenciales de prueba (solo para modo mock) -->
-            <div class="mock-credentials">
-                <p><strong>Credenciales de prueba:</strong></p>
-                <p><small>Admin: admin@pascualbravo.edu.co / admin123</small></p>
-                <p><small>Empresa: empresa@example.com / empresa123</small></p>
-                <p><small>Estudiante: estudiante@pascualbravo.edu.co / estudiante123</small></p>
-                <p><small>Profesor: profesor@pascualbravo.edu.co / profesor123</small></p>
-            </div>
-        </div>
+            
     </div>
 
     <div id="notification"></div>
@@ -72,63 +63,33 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             initializeMockData();
-            
-            // Si ya está autenticado, redirigir al dashboard
-            if (isAuthenticated()) {
-                redirectToDashboard();
-            }
-
-            const loginForm = document.getElementById('loginForm');
-            loginForm.addEventListener('submit', handleLogin);
+            if (isAuthenticated()) redirectToDashboard();
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
         });
 
         async function handleLogin(e) {
             e.preventDefault();
-            
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const rememberMe = document.getElementById('rememberMe').checked;
-            
-            // Validaciones
-            if (!validateEmail(email)) {
-                showNotification('Por favor ingresa un correo electrónico válido', 'error');
-                return;
-            }
-            
-            if (password.length < 6) {
-                showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
-                return;
-            }
-            
-            const loginBtn = document.getElementById('loginBtn');
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Iniciando sesión...';
-            
-            try {
-                // Llamada a la API de login (mock o real)
-                const response = await apiLogin(email, password);
-                
-                // Guardar token y datos de usuario
-                saveAuthData(response.access, response.refresh, response.user, rememberMe);
-                
-                showNotification('¡Inicio de sesión exitoso!', 'success');
-                
-                // Redirigir al dashboard correspondiente
-                setTimeout(() => {
-                    redirectToDashboard();
-                }, 1000);
-                
-            } catch (error) {
-                showNotification(error.message || 'Error al iniciar sesión. Verifica tus credenciales.', 'error');
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Iniciar Sesión';
-            }
-        }
 
-        function validateEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
+            if (!validateEmail(email)) return showNotification('Correo no válido','error');
+            if (password.length < 6) return showNotification('Contraseña mínimo 6 caracteres','error');
+
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true; btn.textContent = 'Iniciando sesión...';
+
+            try {
+                const response = await apiLogin(email,password);
+                saveAuthData(response.access,response.refresh,response.user,rememberMe);
+                showNotification('¡Inicio exitoso!','success');
+                setTimeout(()=> redirectToDashboard(),1000);
+            } catch (err) {
+                showNotification(err.message || 'Error en login','error');
+                btn.disabled = false; btn.textContent = 'Iniciar Sesión';
+            }
         }
+        const validateEmail = email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     </script>
 </body>
 </html>
