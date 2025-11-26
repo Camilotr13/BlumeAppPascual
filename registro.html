@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro - Sistema de Prácticas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="auth-page">
+    <div class="auth-container">
+        <div class="auth-box">
+            <div class="auth-header">
+                <img src="assets/logo.png" alt="Pascual Bravo" class="auth-logo">
+                <h1 class="auth-title">Crear Cuenta</h1>
+                <p class="auth-subtitle">Regístrate en el sistema de prácticas</p>
+            </div>
+
+            <form id="registerForm" class="auth-form">
+                <div class="form-group">
+                    <label for="name" class="form-label">Nombre Completo</label>
+                    <input type="text" id="name" class="form-input" placeholder="Juan Pérez" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Correo Electrónico</label>
+                    <input type="email" id="email" class="form-input" placeholder="tu@correo.com" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone" class="form-label">Teléfono</label>
+                    <input type="tel" id="phone" class="form-input" placeholder="3001234567">
+                </div>
+
+                <div class="form-group">
+                    <label for="role" class="form-label">Tipo de Usuario</label>
+                    <select id="role" class="form-input" required>
+                        <option value="">Selecciona tu rol</option>
+                        <option value="student">Estudiante</option>
+                        <option value="company">Empresa</option>
+                        <option value="teacher">Profesor</option>
+                    </select>
+                </div>
+
+                <!-- Campos adicionales para estudiantes -->
+                <div id="studentFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="student_id" class="form-label">Documento de Identidad</label>
+                        <input type="text" id="student_id" class="form-input" placeholder="1234567890">
+                    </div>
+                    <div class="form-group">
+                        <label for="career" class="form-label">Carrera</label>
+                        <select id="career" class="form-input">
+                            <option value="">Selecciona tu carrera</option>
+                            <option value="Ingeniería de Sistemas">Ingeniería de Sistemas</option>
+                            <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                            <option value="Tecnología en Desarrollo de Software">Tecnología en Desarrollo de Software</option>
+                            <option value="Tecnología en Gestión Administrativa">Tecnología en Gestión Administrativa</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Campos adicionales para empresas -->
+                <div id="companyFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="company_name" class="form-label">Nombre de la Empresa</label>
+                        <input type="text" id="company_name" class="form-input" placeholder="Mi Empresa S.A.">
+                    </div>
+                    <div class="form-group">
+                        <label for="nit" class="form-label">NIT</label>
+                        <input type="text" id="nit" class="form-input" placeholder="900123456-7">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                    <small class="form-help">Mínimo 6 caracteres</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                    <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="acceptTerms" required>
+                        <span>Acepto los términos y condiciones</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block" id="registerBtn">
+                    Registrarse
+                </button>
+
+                <div class="auth-divider">
+                    <span>¿Ya tienes cuenta?</span>
+                </div>
+
+                <a href="login.html" class="btn btn-secondary btn-block">
+                    Iniciar Sesión
+                </a>
+
+                <a href="index.html" class="btn btn-text btn-block">
+                    Volver al inicio
+                </a>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification"></div>
+
+    <script src="js/mockData.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData();
+            
+            const roleSelect = document.getElementById('role');
+            const studentFields = document.getElementById('studentFields');
+            const companyFields = document.getElementById('companyFields');
+            
+            // Mostrar campos según el rol seleccionado
+            roleSelect.addEventListener('change', (e) => {
+                studentFields.style.display = 'none';
+                companyFields.style.display = 'none';
+                
+                if (e.target.value === 'student') {
+                    studentFields.style.display = 'block';
+                } else if (e.target.value === 'company') {
+                    companyFields.style.display = 'block';
+                }
+            });
+            
+            const registerForm = document.getElementById('registerForm');
+            registerForm.addEventListener('submit', handleRegister);
+        });
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const role = document.getElementById('role').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const acceptTerms = document.getElementById('acceptTerms').checked;
+            
+            // Validaciones
+            if (!name || !email || !role || !password) {
+                showNotification('Por favor completa todos los campos obligatorios', 'error');
+                return;
+            }
+            
+            if (!validateEmail(email)) {
+                showNotification('Por favor ingresa un correo electrónico válido', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            if (password !== confirmPassword) {
+                showNotification('Las contraseñas no coinciden', 'error');
+                return;
+            }
+            
+            if (!acceptTerms) {
+                showNotification('Debes aceptar los términos y condiciones', 'error');
+                return;
+            }
+            
+            const userData = {
+                name,
+                email,
+                phone,
+                role,
+                password
+            };
+            
+            // Agregar campos adicionales según el rol
+            if (role === 'student') {
+                userData.student_id = document.getElementById('student_id').value;
+                userData.career = document.getElementById('career').value;
+            } else if (role === 'company') {
+                userData.company_name = document.getElementById('company_name').value;
+                userData.nit = document.getElementById('nit').value;
+            }
+            
+            const registerBtn = document.getElementById('registerBtn');
+            registerBtn.disabled = true;
+            registerBtn.textContent = 'Registrando...';
+            
+            try {
+                await apiRegister(userData);
+                showNotification('¡Registro exitoso! Redirigiendo...', 'success');
+                
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 2000);
+                
+            } catch (error) {
+                showNotification(error.message || 'Error al registrarse', 'error');
+                registerBtn.disabled = false;
+                registerBtn.textContent = 'Registrarse';
+            }
+        }
+
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+    </script>
+</body>
+</html>

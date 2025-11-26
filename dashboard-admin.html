@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Administrador - Sistema de Prácticas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.png" alt="Logo" class="sidebar-logo">
+                <span class="sidebar-title">Admin Panel</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#metrics" class="sidebar-link active" data-section="metrics">
+                    <span class="sidebar-icon">📊</span>
+                    <span>Métricas</span>
+                </a>
+                <a href="#users" class="sidebar-link" data-section="users">
+                    <span class="sidebar-icon">👥</span>
+                    <span>Usuarios</span>
+                </a>
+                <a href="#offers" class="sidebar-link" data-section="offers">
+                    <span class="sidebar-icon">📋</span>
+                    <span>Ofertas</span>
+                </a>
+                <a href="#applications" class="sidebar-link" data-section="applications">
+                    <span class="sidebar-icon">📝</span>
+                    <span>Postulaciones</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-text btn-block">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <h1 id="sectionTitle">Panel de Administración</h1>
+                <div class="user-info">
+                    <span id="userName">Admin</span>
+                    <span class="user-role">Administrador</span>
+                </div>
+            </header>
+
+            <!-- Métricas Section -->
+            <section id="metricsSection" class="dashboard-section active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-icon">👥</div>
+                        <div class="metric-value" id="metricUsers">0</div>
+                        <div class="metric-label">Total Usuarios</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📋</div>
+                        <div class="metric-value" id="metricOffers">0</div>
+                        <div class="metric-label">Ofertas Pendientes</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">✅</div>
+                        <div class="metric-value" id="metricPractices">0</div>
+                        <div class="metric-label">Prácticas en Curso</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-icon">📝</div>
+                        <div class="metric-value" id="metricApplications">0</div>
+                        <div class="metric-label">Postulaciones Activas</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2 class="card-title">Actividad Reciente</h2>
+                    <div id="recentActivity" class="activity-list">
+                        <!-- Se carga dinámicamente -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Usuarios Section -->
+            <section id="usersSection" class="dashboard-section">
+                <div class="section-actions">
+                    <input type="text" id="userSearch" class="search-input" placeholder="Buscar usuarios...">
+                    <select id="roleFilter" class="filter-select">
+                        <option value="">Todos los roles</option>
+                        <option value="student">Estudiantes</option>
+                        <option value="company">Empresas</option>
+                        <option value="teacher">Profesores</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nombre</th>
+                                    <th>Email</th>
+                                    <th>Rol</th>
+                                    <th>Fecha Registro</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Se carga dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ofertas Section -->
+            <section id="offersSection" class="dashboard-section">
+                <div class="section-actions">
+                    <input type="text" id="offerSearch" class="search-input" placeholder="Buscar ofertas...">
+                    <select id="offerStatusFilter" class="filter-select">
+                        <option value="pending">Pendientes</option>
+                        <option value="approved">Aprobadas</option>
+                        <option value="rejected">Rechazadas</option>
+                    </select>
+                </div>
+
+                <div id="offersGrid" class="offers-grid">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Postulaciones Section -->
+            <section id="applicationsSection" class="dashboard-section">
+                <div class="section-actions">
+                    <select id="applicationStatusFilter" class="filter-select">
+                        <option value="">Todos los estados</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="company_accepted">Empresa Aceptó</option>
+                        <option value="company_rejected">Empresa Rechazó</option>
+                        <option value="approved">Aprobadas</option>
+                        <option value="rejected">Rechazadas</option>
+                    </select>
+                </div>
+
+                <div class="card">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Estudiante</th>
+                                    <th>Oferta</th>
+                                    <th>Empresa</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="applicationsTableBody">
+                                <!-- Se carga dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Asignar Profesor -->
+    <div id="assignTeacherModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 class="modal-title">Asignar Profesor</h2>
+            <form id="assignTeacherForm">
+                <input type="hidden" id="applicationId">
+                <div class="form-group">
+                    <label class="form-label">Profesor:</label>
+                    <select id="teacherSelect" class="form-input" required>
+                        <option value="">Selecciona un profesor</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">Asignar</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('assignTeacherModal')">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="notification"></div>
+
+    <script src="js/mockData.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/offers.js"></script>
+    <script src="js/applications.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData();
+            requireAuth('admin');
+            
+            const user = getCurrentUser();
+            document.getElementById('userName').textContent = user.name;
+            
+            loadMetrics();
+            setupNavigation();
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('userSearch').addEventListener('input', loadUsers);
+            document.getElementById('roleFilter').addEventListener('change', loadUsers);
+            document.getElementById('offerSearch').addEventListener('input', loadOffers);
+            document.getElementById('offerStatusFilter').addEventListener('change', loadOffers);
+            document.getElementById('applicationStatusFilter').addEventListener('change', loadApplications);
+            document.getElementById('assignTeacherForm').addEventListener('submit', handleAssignTeacher);
+        });
+
+        function setupNavigation() {
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.dataset.section;
+                    showSection(section);
+                    
+                    links.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+        }
+
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.dashboard-section');
+            sections.forEach(s => s.classList.remove('active'));
+            
+            const section = document.getElementById(sectionName + 'Section');
+            if (section) {
+                section.classList.add('active');
+                
+                // Cargar datos de la sección
+                switch(sectionName) {
+                    case 'metrics': loadMetrics(); break;
+                    case 'users': loadUsers(); break;
+                    case 'offers': loadOffers(); break;
+                    case 'applications': loadApplications(); break;
+                }
+            }
+        }
+
+        async function loadMetrics() {
+            try {
+                const metrics = await apiGetAdminMetrics();
+                document.getElementById('metricUsers').textContent = metrics.total_users;
+                document.getElementById('metricOffers').textContent = metrics.pending_offers;
+                document.getElementById('metricPractices').textContent = metrics.ongoing_practices;
+                document.getElementById('metricApplications').textContent = metrics.total_applications || 0;
+                
+                renderRecentActivity(metrics.recent_activities);
+            } catch (error) {
+                showNotification('Error al cargar métricas', 'error');
+            }
+        }
+
+        function renderRecentActivity(activities) {
+            const container = document.getElementById('recentActivity');
+            if (!activities || activities.length === 0) {
+                container.innerHTML = '<p class="empty-state">No hay actividad reciente</p>';
+                return;
+            }
+            
+            container.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">${activity.icon || '📝'}</div>
+                    <div class="activity-content">
+                        <div class="activity-text">${activity.text}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadUsers() {
+            try {
+                const search = document.getElementById('userSearch').value;
+                const role = document.getElementById('roleFilter').value;
+                
+                const users = await apiGetUsers({ search, role });
+                renderUsers(users);
+            } catch (error) {
+                showNotification('Error al cargar usuarios', 'error');
+            }
+        }
+
+        function renderUsers(users) {
+            const tbody = document.getElementById('usersTableBody');
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No se encontraron usuarios</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${user.name}</td>
+                    <td>${user.email}</td>
+                    <td><span class="badge badge-${user.role}">${getRoleLabel(user.role)}</span></td>
+                    <td>${formatDate(user.date_joined)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editUser(${user.id})">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteUser(${user.id})">Eliminar</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadOffers() {
+            try {
+                const search = document.getElementById('offerSearch').value;
+                const status = document.getElementById('offerStatusFilter').value;
+                
+                const offers = await apiGetOffers({ search, status });
+                renderAdminOffers(offers);
+            } catch (error) {
+                showNotification('Error al cargar ofertas', 'error');
+            }
+        }
+
+        function renderAdminOffers(offers) {
+            const grid = document.getElementById('offersGrid');
+            if (offers.length === 0) {
+                grid.innerHTML = '<p class="empty-state">No se encontraron ofertas</p>';
+                return;
+            }
+            
+            grid.innerHTML = offers.map(offer => `
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <h3 class="offer-title">${offer.title}</h3>
+                        <span class="badge badge-${offer.status}">${getStatusLabel(offer.status)}</span>
+                    </div>
+                    <div class="offer-company">${offer.company_name || 'Empresa'}</div>
+                    <div class="offer-details">
+                        <span>📚 ${offer.career}</span>
+                        <span>📅 ${formatDate(offer.deadline)}</span>
+                    </div>
+                    <div class="offer-actions">
+                        ${offer.status === 'pending' ? `
+                            <button class="btn btn-sm btn-primary" onclick="approveOffer(${offer.id})">Aprobar</button>
+                            <button class="btn btn-sm btn-danger" onclick="rejectOffer(${offer.id})">Rechazar</button>
+                        ` : ''}
+                        <button class="btn btn-sm btn-secondary" onclick="showOfferDetail(${offer.id})">Ver</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadApplications() {
+            try {
+                const status = document.getElementById('applicationStatusFilter').value;
+                const applications = await apiGetAllApplications({ status });
+                renderApplications(applications);
+            } catch (error) {
+                showNotification('Error al cargar postulaciones', 'error');
+            }
+        }
+
+        function renderApplications(applications) {
+            const tbody = document.getElementById('applicationsTableBody');
+            if (applications.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No se encontraron postulaciones</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = applications.map(app => `
+                <tr>
+                    <td>${app.id}</td>
+                    <td>${app.student_name}</td>
+                    <td>${app.offer_title}</td>
+                    <td>${app.company_name}</td>
+                    <td><span class="badge badge-${app.status}">${getStatusLabel(app.status)}</span></td>
+                    <td>${formatDate(app.applied_at)}</td>
+                    <td>
+                        ${app.status === 'company_accepted' ? `
+                            <button class="btn btn-sm btn-primary" onclick="openAssignTeacher(${app.id})">Asignar Profesor</button>
+                        ` : ''}
+                        ${app.status === 'pending' || app.status === 'company_accepted' ? `
+                            <button class="btn btn-sm btn-danger" onclick="rejectApplication(${app.id})">Rechazar</button>
+                        ` : ''}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function approveOffer(offerId) {
+            if (!confirm('¿Aprobar esta oferta?')) return;
+            try {
+                await apiUpdateOffer(offerId, { status: 'approved' });
+                showNotification('Oferta aprobada', 'success');
+                loadOffers();
+            } catch (error) {
+                showNotification('Error al aprobar oferta', 'error');
+            }
+        }
+
+        async function rejectOffer(offerId) {
+            if (!confirm('¿Rechazar esta oferta?')) return;
+            try {
+                await apiUpdateOffer(offerId, { status: 'rejected' });
+                showNotification('Oferta rechazada', 'success');
+                loadOffers();
+            } catch (error) {
+                showNotification('Error al rechazar oferta', 'error');
+            }
+        }
+
+        async function rejectApplication(appId) {
+            if (!confirm('¿Rechazar esta postulación?')) return;
+            try {
+                await apiAdminReviewApplication(appId, { status: 'rejected' });
+                showNotification('Postulación rechazada', 'success');
+                loadApplications();
+            } catch (error) {
+                showNotification('Error al rechazar postulación', 'error');
+            }
+        }
+
+        async function openAssignTeacher(appId) {
+            try {
+                const teachers = await apiGetUsers({ role: 'teacher' });
+                const select = document.getElementById('teacherSelect');
+                select.innerHTML = '<option value="">Selecciona un profesor</option>' + 
+                    teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
+                
+                document.getElementById('applicationId').value = appId;
+                openModal('assignTeacherModal');
+            } catch (error) {
+                showNotification('Error al cargar profesores', 'error');
+            }
+        }
+
+        async function handleAssignTeacher(e) {
+            e.preventDefault();
+            const appId = document.getElementById('applicationId').value;
+            const teacherId = document.getElementById('teacherSelect').value;
+            
+            if (!teacherId) {
+                showNotification('Selecciona un profesor', 'error');
+                return;
+            }
+            
+            try {
+                await apiAdminReviewApplication(appId, {
+                    status: 'approved',
+                    assigned_teacher_id: teacherId
+                });
+                showNotification('Profesor asignado exitosamente', 'success');
+                closeModal('assignTeacherModal');
+                loadApplications();
+            } catch (error) {
+                showNotification('Error al asignar profesor', 'error');
+            }
+        }
+
+        function editUser(userId) {
+            showNotification('Funcionalidad de edición en desarrollo', 'info');
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('¿Eliminar este usuario?')) return;
+            try {
+                await apiDeleteUser(userId);
+                showNotification('Usuario eliminado', 'success');
+                loadUsers();
+            } catch (error) {
+                showNotification('Error al eliminar usuario', 'error');
+            }
+        }
+
+        function getRoleLabel(role) {
+            const labels = {
+                'admin': 'Administrador',
+                'student': 'Estudiante',
+                'company': 'Empresa',
+                'teacher': 'Profesor'
+            };
+            return labels[role] || role;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': 'Pendiente',
+                'approved': 'Aprobada',
+                'rejected': 'Rechazada',
+                'company_accepted': 'Empresa Aceptó',
+                'company_rejected': 'Empresa Rechazó'
+            };
+            return labels[status] || status;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CO');
+        }
+    </script>
+</body>
+</html>

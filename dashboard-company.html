@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Empresa - Sistema de Prácticas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.png" alt="Logo" class="sidebar-logo">
+                <span class="sidebar-title">Empresa</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#myoffers" class="sidebar-link active" data-section="myoffers">
+                    <span class="sidebar-icon">📋</span>
+                    <span>Mis Ofertas</span>
+                </a>
+                <a href="#createoffer" class="sidebar-link" data-section="createoffer">
+                    <span class="sidebar-icon">➕</span>
+                    <span>Publicar Oferta</span>
+                </a>
+                <a href="#applicants" class="sidebar-link" data-section="applicants">
+                    <span class="sidebar-icon">👥</span>
+                    <span>Postulantes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-text btn-block">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h1 id="sectionTitle">Mis Ofertas</h1>
+                <div class="user-info">
+                    <span id="userName">Empresa</span>
+                    <span class="user-role">Empresa</span>
+                </div>
+            </header>
+
+            <!-- Mis Ofertas Section -->
+            <section id="myoffersSection" class="dashboard-section active">
+                <div class="section-actions">
+                    <input type="text" id="offerSearch" class="search-input" placeholder="Buscar mis ofertas...">
+                    <select id="statusFilter" class="filter-select">
+                        <option value="">Todos los estados</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="approved">Aprobadas</option>
+                        <option value="rejected">Rechazadas</option>
+                    </select>
+                </div>
+
+                <div id="offersGrid" class="offers-grid">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Crear Oferta Section -->
+            <section id="createofferSection" class="dashboard-section">
+                <div class="card">
+                    <h2 class="card-title">Publicar Nueva Oferta</h2>
+                    <form id="createOfferForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="title" class="form-label">Título de la Oferta *</label>
+                                <input type="text" id="title" class="form-input" required placeholder="Ej: Desarrollador Junior">
+                            </div>
+                            <div class="form-group">
+                                <label for="type" class="form-label">Tipo *</label>
+                                <select id="type" class="form-input" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="Pasantía">Pasantía</option>
+                                    <option value="Práctica">Práctica</option>
+                                    <option value="Proyecto">Proyecto</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="career" class="form-label">Carrera *</label>
+                                <select id="career" class="form-input" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="Ingeniería de Sistemas">Ingeniería de Sistemas</option>
+                                    <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                                    <option value="Tecnología en Desarrollo de Software">Tecnología en Desarrollo de Software</option>
+                                    <option value="Tecnología en Gestión Administrativa">Tecnología en Gestión Administrativa</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="deadline" class="form-label">Fecha Límite *</label>
+                                <input type="date" id="deadline" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description" class="form-label">Descripción *</label>
+                            <textarea id="description" class="form-input" rows="4" required placeholder="Describe las responsabilidades y actividades..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="requirements" class="form-label">Requisitos *</label>
+                            <textarea id="requirements" class="form-input" rows="4" required placeholder="Lista los requisitos necesarios..."></textarea>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="submitOfferBtn">Publicar Oferta</button>
+                            <button type="reset" class="btn btn-secondary">Limpiar</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- Postulantes Section -->
+            <section id="applicantsSection" class="dashboard-section">
+                <div class="section-actions">
+                    <select id="offerSelectFilter" class="filter-select">
+                        <option value="">Todas las ofertas</option>
+                    </select>
+                    <select id="applicantStatusFilter" class="filter-select">
+                        <option value="">Todos los estados</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="company_accepted">Aceptados</option>
+                        <option value="company_rejected">Rechazados</option>
+                    </select>
+                </div>
+
+                <div id="applicantsContainer">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Ver Postulante -->
+    <div id="applicantModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="applicantDetailContent">
+                <!-- Se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div id="notification"></div>
+
+    <script src="js/mockData.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/offers.js"></script>
+    <script src="js/applications.js"></script>
+    <script>
+        let currentUser;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData();
+            requireAuth('company');
+            
+            currentUser = getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.name;
+            
+            setupNavigation();
+            loadMyOffers();
+            setMinDate();
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('createOfferForm').addEventListener('submit', handleCreateOffer);
+            document.getElementById('offerSearch').addEventListener('input', loadMyOffers);
+            document.getElementById('statusFilter').addEventListener('change', loadMyOffers);
+            document.getElementById('offerSelectFilter').addEventListener('change', loadApplicants);
+            document.getElementById('applicantStatusFilter').addEventListener('change', loadApplicants);
+        });
+
+        function setupNavigation() {
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.dataset.section;
+                    showSection(section);
+                    
+                    links.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+        }
+
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.dashboard-section');
+            sections.forEach(s => s.classList.remove('active'));
+            
+            const section = document.getElementById(sectionName + 'Section');
+            if (section) {
+                section.classList.add('active');
+                
+                const titles = {
+                    'myoffers': 'Mis Ofertas',
+                    'createoffer': 'Publicar Oferta',
+                    'applicants': 'Postulantes'
+                };
+                document.getElementById('sectionTitle').textContent = titles[sectionName];
+                
+                if (sectionName === 'myoffers') loadMyOffers();
+                if (sectionName === 'applicants') {
+                    loadOffersForFilter();
+                    loadApplicants();
+                }
+            }
+        }
+
+        function setMinDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('deadline').min = today;
+        }
+
+        async function loadMyOffers() {
+            try {
+                const search = document.getElementById('offerSearch').value;
+                const status = document.getElementById('statusFilter').value;
+                
+                const offers = await apiGetOffers({ company_id: currentUser.id, search, status });
+                renderMyOffers(offers);
+            } catch (error) {
+                showNotification('Error al cargar ofertas', 'error');
+            }
+        }
+
+        function renderMyOffers(offers) {
+            const grid = document.getElementById('offersGrid');
+            if (offers.length === 0) {
+                grid.innerHTML = '<p class="empty-state">No tienes ofertas publicadas</p>';
+                return;
+            }
+            
+            grid.innerHTML = offers.map(offer => `
+                <div class="offer-card">
+                    <div class="offer-header">
+                        <h3 class="offer-title">${offer.title}</h3>
+                        <span class="badge badge-${offer.status}">${getStatusLabel(offer.status)}</span>
+                    </div>
+                    <div class="offer-meta">
+                        <span>📚 ${offer.career}</span>
+                        <span>📅 ${formatDate(offer.deadline)}</span>
+                        <span>👥 ${offer.applicants_count || 0} postulantes</span>
+                    </div>
+                    <div class="offer-description">${truncate(offer.description, 100)}</div>
+                    <div class="offer-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewOfferApplicants(${offer.id})">Ver Postulantes</button>
+                        <button class="btn btn-sm btn-secondary" onclick="editOffer(${offer.id})">Editar</button>
+                        ${offer.status === 'pending' || offer.status === 'approved' ? `
+                            <button class="btn btn-sm btn-danger" onclick="deleteOffer(${offer.id})">Eliminar</button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function handleCreateOffer(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value.trim();
+            const type = document.getElementById('type').value;
+            const career = document.getElementById('career').value;
+            const deadline = document.getElementById('deadline').value;
+            const description = document.getElementById('description').value.trim();
+            const requirements = document.getElementById('requirements').value.trim();
+            
+            // Validar fecha límite
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const selectedDate = new Date(deadline);
+            
+            if (selectedDate <= today) {
+                showNotification('La fecha límite debe ser mayor a la fecha actual', 'error');
+                return;
+            }
+            
+            const offerData = {
+                title,
+                type,
+                career,
+                deadline,
+                description,
+                requirements,
+                company_id: currentUser.id,
+                company_name: currentUser.name,
+                status: 'pending'
+            };
+            
+            const submitBtn = document.getElementById('submitOfferBtn');
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Publicando...';
+            
+            try {
+                await apiCreateOffer(offerData);
+                showNotification('Oferta publicada exitosamente. Pendiente de aprobación por admin.', 'success');
+                document.getElementById('createOfferForm').reset();
+                showSection('myoffers');
+            } catch (error) {
+                showNotification(error.message || 'Error al publicar oferta', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Publicar Oferta';
+            }
+        }
+
+        function viewOfferApplicants(offerId) {
+            showSection('applicants');
+            document.getElementById('offerSelectFilter').value = offerId;
+            loadApplicants();
+        }
+
+        async function loadOffersForFilter() {
+            try {
+                const offers = await apiGetOffers({ company_id: currentUser.id });
+                const select = document.getElementById('offerSelectFilter');
+                select.innerHTML = '<option value="">Todas las ofertas</option>' +
+                    offers.map(o => `<option value="${o.id}">${o.title}</option>`).join('');
+            } catch (error) {
+                console.error('Error loading offers for filter:', error);
+            }
+        }
+
+        async function loadApplicants() {
+            try {
+                const offerId = document.getElementById('offerSelectFilter').value;
+                const status = document.getElementById('applicantStatusFilter').value;
+                
+                let applications = [];
+                if (offerId) {
+                    applications = await apiGetOfferApplicants(offerId);
+                } else {
+                    // Cargar todas las aplicaciones de todas las ofertas de la empresa
+                    const offers = await apiGetOffers({ company_id: currentUser.id });
+                    for (const offer of offers) {
+                        const apps = await apiGetOfferApplicants(offer.id);
+                        applications.push(...apps);
+                    }
+                }
+                
+                if (status) {
+                    applications = applications.filter(app => app.status === status);
+                }
+                
+                renderApplicants(applications);
+            } catch (error) {
+                showNotification('Error al cargar postulantes', 'error');
+            }
+        }
+
+        function renderApplicants(applications) {
+            const container = document.getElementById('applicantsContainer');
+            if (applications.length === 0) {
+                container.innerHTML = '<p class="empty-state">No hay postulantes</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="applicants-grid">
+                    ${applications.map(app => `
+                        <div class="applicant-card">
+                            <div class="applicant-header">
+                                <div class="applicant-avatar">👤</div>
+                                <div>
+                                    <h3 class="applicant-name">${app.student_name}</h3>
+                                    <div class="applicant-career">${app.profile_snapshot?.career || 'No especificado'}</div>
+                                </div>
+                            </div>
+                            <div class="applicant-info">
+                                <p><strong>Oferta:</strong> ${app.offer_title}</p>
+                                <p><strong>Email:</strong> ${app.profile_snapshot?.email || '-'}</p>
+                                <p><strong>Teléfono:</strong> ${app.profile_snapshot?.phone || '-'}</p>
+                                <p><strong>Fecha aplicación:</strong> ${formatDate(app.applied_at)}</p>
+                                <p><strong>Estado:</strong> <span class="badge badge-${app.status}">${getStatusLabel(app.status)}</span></p>
+                            </div>
+                            <div class="applicant-actions">
+                                ${app.status === 'pending' ? `
+                                    <button class="btn btn-sm btn-primary" onclick="acceptApplicant(${app.id})">Aceptar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="rejectApplicant(${app.id})">Rechazar</button>
+                                ` : ''}
+                                <button class="btn btn-sm btn-secondary" onclick="viewApplicantDetail(${app.id})">Ver Detalle</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        async function acceptApplicant(appId) {
+            if (!confirm('¿Aceptar este postulante? El admin deberá aprobar y asignar un profesor.')) return;
+            
+            try {
+                await apiCompanyReviewApplication(appId, { status: 'company_accepted' });
+                showNotification('Postulante aceptado. Pendiente de revisión del admin.', 'success');
+                loadApplicants();
+            } catch (error) {
+                showNotification('Error al aceptar postulante', 'error');
+            }
+        }
+
+        async function rejectApplicant(appId) {
+            if (!confirm('¿Rechazar este postulante?')) return;
+            
+            try {
+                await apiCompanyReviewApplication(appId, { status: 'company_rejected' });
+                showNotification('Postulante rechazado', 'success');
+                loadApplicants();
+            } catch (error) {
+                showNotification('Error al rechazar postulante', 'error');
+            }
+        }
+
+        function viewApplicantDetail(appId) {
+            showNotification('Vista detallada en desarrollo', 'info');
+        }
+
+        function editOffer(offerId) {
+            showNotification('Edición de ofertas en desarrollo', 'info');
+        }
+
+        async function deleteOffer(offerId) {
+            if (!confirm('¿Eliminar esta oferta? Esta acción no se puede deshacer.')) return;
+            
+            try {
+                await apiDeleteOffer(offerId);
+                showNotification('Oferta eliminada', 'success');
+                loadMyOffers();
+            } catch (error) {
+                showNotification('Error al eliminar oferta', 'error');
+            }
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': 'Pendiente',
+                'approved': 'Aprobada',
+                'rejected': 'Rechazada',
+                'company_accepted': 'Aceptada',
+                'company_rejected': 'Rechazada'
+            };
+            return labels[status] || status;
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CO');
+        }
+
+        function truncate(text, length) {
+            if (!text) return '';
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+    </script>
+</body>
+</html>

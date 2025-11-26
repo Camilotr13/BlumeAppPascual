@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Prácticas - Pascual Bravo</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="assets/logo.png" alt="Pascual Bravo" class="logo-img">
+                    <span class="logo-text">Sistema de Prácticas</span>
+                </div>
+                <nav class="nav">
+                    <a href="index.html" class="nav-link active">Inicio</a>
+                    <a href="login.html" class="nav-link">Iniciar Sesión</a>
+                    <a href="register.html" class="nav-link btn-primary">Registrarse</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1 class="hero-title">Encuentra tu Práctica Profesional</h1>
+                    <p class="hero-subtitle">Conectamos estudiantes con empresas para experiencias laborales significativas</p>
+                    
+                    <!-- Buscador -->
+                    <div class="search-box">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar ofertas por título, empresa, carrera...">
+                        <button id="searchBtn" class="btn btn-primary">Buscar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Ofertas Section -->
+        <section class="offers-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Ofertas Disponibles</h2>
+                    <div class="filters">
+                        <select id="careerFilter" class="filter-select">
+                            <option value="">Todas las carreras</option>
+                            <option value="Ingeniería de Sistemas">Ingeniería de Sistemas</option>
+                            <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                            <option value="Tecnología en Desarrollo de Software">Tecnología en Desarrollo de Software</option>
+                            <option value="Tecnología en Gestión Administrativa">Tecnología en Gestión Administrativa</option>
+                        </select>
+                        <select id="typeFilter" class="filter-select">
+                            <option value="">Todos los tipos</option>
+                            <option value="Pasantía">Pasantía</option>
+                            <option value="Práctica">Práctica</option>
+                            <option value="Proyecto">Proyecto</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="offersContainer" class="offers-grid">
+                    <!-- Las ofertas se cargarán dinámicamente aquí -->
+                    <div class="loader" id="loader">Cargando ofertas...</div>
+                </div>
+
+                <div id="noResults" class="no-results" style="display: none;">
+                    <p>No se encontraron ofertas que coincidan con tu búsqueda.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalOffers">0</div>
+                        <div class="stat-label">Ofertas Activas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCompanies">0</div>
+                        <div class="stat-label">Empresas Asociadas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalStudents">0</div>
+                        <div class="stat-label">Estudiantes Registrados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPractices">0</div>
+                        <div class="stat-label">Prácticas Completadas</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Instituto Universitario Pascual Bravo. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Modal Detalle de Oferta -->
+    <div id="offerModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="offerDetailContent">
+                <!-- Se cargará dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script src="js/mockData.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/offers.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Inicialización específica para index.html
+        document.addEventListener('DOMContentLoaded', async () => {
+            initializeMockData();
+            await loadPublicOffers();
+            loadStats();
+            
+            // Event listeners
+            document.getElementById('searchBtn').addEventListener('click', handleSearch);
+            document.getElementById('searchInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleSearch();
+            });
+            document.getElementById('careerFilter').addEventListener('change', handleSearch);
+            document.getElementById('typeFilter').addEventListener('change', handleSearch);
+        });
+
+        async function loadPublicOffers() {
+            try {
+                showLoader();
+                const search = document.getElementById('searchInput').value;
+                const career = document.getElementById('careerFilter').value;
+                const type = document.getElementById('typeFilter').value;
+                
+                const offers = await apiGetOffers({ search, career, type, status: 'approved' });
+                renderOffers(offers);
+            } catch (error) {
+                showNotification('Error al cargar ofertas', 'error');
+            } finally {
+                hideLoader();
+            }
+        }
+
+        function renderOffers(offers) {
+            const container = document.getElementById('offersContainer');
+            const noResults = document.getElementById('noResults');
+            
+            if (offers.length === 0) {
+                container.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            container.innerHTML = offers.map(offer => createOfferCard(offer, false)).join('');
+            
+            // Agregar event listeners a las tarjetas
+            document.querySelectorAll('.offer-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const offerId = card.dataset.offerId;
+                    showOfferDetail(offerId);
+                });
+            });
+        }
+
+        function handleSearch() {
+            loadPublicOffers();
+        }
+
+        function showLoader() {
+            document.getElementById('loader').style.display = 'block';
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').style.display = 'none';
+        }
+
+        async function loadStats() {
+            try {
+                const offers = await apiGetOffers({ status: 'approved' });
+                const users = JSON.parse(localStorage.getItem('mock_users') || '[]');
+                const applications = JSON.parse(localStorage.getItem('mock_applications') || '[]');
+                
+                document.getElementById('totalOffers').textContent = offers.length;
+                document.getElementById('totalCompanies').textContent = users.filter(u => u.role === 'company').length;
+                document.getElementById('totalStudents').textContent = users.filter(u => u.role === 'student').length;
+                document.getElementById('totalPractices').textContent = applications.filter(a => a.status === 'approved').length;
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+    </script>
+</body>
+</html>

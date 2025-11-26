@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Estudiante - Sistema de Prácticas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.png" alt="Logo" class="sidebar-logo">
+                <span class="sidebar-title">Estudiante</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#profile" class="sidebar-link active" data-section="profile">
+                    <span class="sidebar-icon">👤</span>
+                    <span>Mi Perfil</span>
+                </a>
+                <a href="#offers" class="sidebar-link" data-section="offers">
+                    <span class="sidebar-icon">🔍</span>
+                    <span>Buscar Ofertas</span>
+                </a>
+                <a href="#myapplications" class="sidebar-link" data-section="myapplications">
+                    <span class="sidebar-icon">📝</span>
+                    <span>Mis Postulaciones</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-text btn-block">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h1 id="sectionTitle">Mi Perfil</h1>
+                <div class="user-info">
+                    <span id="userName">Estudiante</span>
+                    <span class="user-role">Estudiante</span>
+                </div>
+            </header>
+
+            <!-- Perfil Section -->
+            <section id="profileSection" class="dashboard-section active">
+                <div class="profile-grid">
+                    <div class="card">
+                        <div class="profile-header">
+                            <div class="profile-avatar">
+                                <img src="assets/logo.png" alt="Avatar" id="profileAvatar">
+                            </div>
+                            <div class="profile-info">
+                                <h2 id="profileName">Estudiante</h2>
+                                <p id="profileEmail">estudiante@pascualbravo.edu.co</p>
+                                <p id="profileCareer">Carrera</p>
+                            </div>
+                        </div>
+                        <div class="profile-details">
+                            <div class="detail-row">
+                                <span class="detail-label">Documento:</span>
+                                <span class="detail-value" id="profileDocument">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Teléfono:</span>
+                                <span class="detail-value" id="profilePhone">-</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">Miembro desde:</span>
+                                <span class="detail-value" id="profileJoinDate">-</span>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-block" onclick="editProfile()">Editar Perfil</button>
+                    </div>
+
+                    <div class="card">
+                        <h3 class="card-title">Estadísticas</h3>
+                        <div class="stats-list">
+                            <div class="stat-item">
+                                <span class="stat-label">Postulaciones:</span>
+                                <span class="stat-value" id="statApplications">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Aprobadas:</span>
+                                <span class="stat-value text-success" id="statApproved">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Pendientes:</span>
+                                <span class="stat-value text-warning" id="statPending">0</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">Rechazadas:</span>
+                                <span class="stat-value text-danger" id="statRejected">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Ofertas Section -->
+            <section id="offersSection" class="dashboard-section">
+                <div class="section-actions">
+                    <input type="text" id="offerSearch" class="search-input" placeholder="Buscar ofertas...">
+                    <select id="careerFilter" class="filter-select">
+                        <option value="">Todas las carreras</option>
+                        <option value="Ingeniería de Sistemas">Ingeniería de Sistemas</option>
+                        <option value="Ingeniería Industrial">Ingeniería Industrial</option>
+                        <option value="Tecnología en Desarrollo de Software">Tecnología en Desarrollo de Software</option>
+                        <option value="Tecnología en Gestión Administrativa">Tecnología en Gestión Administrativa</option>
+                    </select>
+                    <select id="typeFilter" class="filter-select">
+                        <option value="">Todos los tipos</option>
+                        <option value="Pasantía">Pasantía</option>
+                        <option value="Práctica">Práctica</option>
+                        <option value="Proyecto">Proyecto</option>
+                    </select>
+                </div>
+
+                <div id="offersGrid" class="offers-grid">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Mis Postulaciones Section -->
+            <section id="myapplicationsSection" class="dashboard-section">
+                <div class="section-actions">
+                    <select id="applicationStatusFilter" class="filter-select">
+                        <option value="">Todos los estados</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="company_accepted">Empresa Aceptó</option>
+                        <option value="company_rejected">Empresa Rechazó</option>
+                        <option value="approved">Aprobadas</option>
+                        <option value="rejected">Rechazadas</option>
+                    </select>
+                </div>
+
+                <div id="applicationsContainer">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Detalle de Oferta -->
+    <div id="offerModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div id="offerDetailContent">
+                <!-- Se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div id="notification"></div>
+
+    <script src="js/mockData.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/offers.js"></script>
+    <script src="js/applications.js"></script>
+    <script src="js/profile.js"></script>
+    <script>
+        let currentUser;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData();
+            requireAuth('student');
+            
+            currentUser = getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.name;
+            
+            setupNavigation();
+            loadProfile();
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+            document.getElementById('offerSearch').addEventListener('input', loadOffers);
+            document.getElementById('careerFilter').addEventListener('change', loadOffers);
+            document.getElementById('typeFilter').addEventListener('change', loadOffers);
+            document.getElementById('applicationStatusFilter').addEventListener('change', loadMyApplications);
+        });
+
+        function setupNavigation() {
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.dataset.section;
+                    showSection(section);
+                    
+                    links.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+        }
+
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.dashboard-section');
+            sections.forEach(s => s.classList.remove('active'));
+            
+            const section = document.getElementById(sectionName + 'Section');
+            if (section) {
+                section.classList.add('active');
+                
+                const titles = {
+                    'profile': 'Mi Perfil',
+                    'offers': 'Buscar Ofertas',
+                    'myapplications': 'Mis Postulaciones'
+                };
+                document.getElementById('sectionTitle').textContent = titles[sectionName];
+                
+                if (sectionName === 'profile') loadProfile();
+                if (sectionName === 'offers') loadOffers();
+                if (sectionName === 'myapplications') loadMyApplications();
+            }
+        }
+
+        async function loadProfile() {
+            try {
+                document.getElementById('profileName').textContent = currentUser.name;
+                document.getElementById('profileEmail').textContent = currentUser.email;
+                document.getElementById('profileCareer').textContent = currentUser.career || 'No especificado';
+                document.getElementById('profileDocument').textContent = currentUser.student_id || '-';
+                document.getElementById('profilePhone').textContent = currentUser.phone || '-';
+                document.getElementById('profileJoinDate').textContent = formatDate(currentUser.date_joined);
+                
+                // Cargar estadísticas
+                const applications = await apiGetStudentApplications(currentUser.id);
+                document.getElementById('statApplications').textContent = applications.length;
+                document.getElementById('statApproved').textContent = applications.filter(a => a.status === 'approved').length;
+                document.getElementById('statPending').textContent = applications.filter(a => a.status === 'pending').length;
+                document.getElementById('statRejected').textContent = applications.filter(a => a.status === 'rejected' || a.status === 'company_rejected').length;
+                
+            } catch (error) {
+                showNotification('Error al cargar perfil', 'error');
+            }
+        }
+
+        async function loadOffers() {
+            try {
+                const search = document.getElementById('offerSearch').value;
+                const career = document.getElementById('careerFilter').value;
+                const type = document.getElementById('typeFilter').value;
+                
+                const offers = await apiGetOffers({ search, career, type, status: 'approved' });
+                renderOffers(offers);
+            } catch (error) {
+                showNotification('Error al cargar ofertas', 'error');
+            }
+        }
+
+        function renderOffers(offers) {
+            const grid = document.getElementById('offersGrid');
+            if (offers.length === 0) {
+                grid.innerHTML = '<p class="empty-state">No se encontraron ofertas disponibles</p>';
+                return;
+            }
+            
+            grid.innerHTML = offers.map(offer => `
+                <div class="offer-card" data-offer-id="${offer.id}">
+                    <div class="offer-header">
+                        <h3 class="offer-title">${offer.title}</h3>
+                        <span class="badge badge-${offer.type}">${offer.type}</span>
+                    </div>
+                    <div class="offer-company">${offer.company_name || 'Empresa'}</div>
+                    <div class="offer-details">
+                        <span>📚 ${offer.career}</span>
+                        <span>📅 Hasta ${formatDate(offer.deadline)}</span>
+                    </div>
+                    <div class="offer-description">${truncate(offer.description, 100)}</div>
+                    <div class="offer-actions">
+                        <button class="btn btn-sm btn-primary" onclick="applyToOffer(${offer.id})">Aplicar</button>
+                        <button class="btn btn-sm btn-secondary" onclick="showOfferDetail(${offer.id})">Ver Detalle</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function applyToOffer(offerId) {
+            if (!confirm('¿Deseas aplicar a esta oferta?')) return;
+            
+            try {
+                // Verificar si ya aplicó
+                const myApps = await apiGetStudentApplications(currentUser.id);
+                const alreadyApplied = myApps.some(app => app.offer_id === offerId);
+                
+                if (alreadyApplied) {
+                    showNotification('Ya has aplicado a esta oferta', 'warning');
+                    return;
+                }
+                
+                const profileSnapshot = {
+                    name: currentUser.name,
+                    email: currentUser.email,
+                    phone: currentUser.phone,
+                    career: currentUser.career,
+                    student_id: currentUser.student_id
+                };
+                
+                await apiApplyToOffer(offerId, {
+                    student_id: currentUser.id,
+                    profile_snapshot: profileSnapshot
+                });
+                
+                showNotification('¡Aplicación enviada exitosamente!', 'success');
+                
+            } catch (error) {
+                showNotification(error.message || 'Error al aplicar a la oferta', 'error');
+            }
+        }
+
+        async function showOfferDetail(offerId) {
+            try {
+                const offer = await apiGetOffer(offerId);
+                renderOfferModal(offer);
+                openModal('offerModal');
+            } catch (error) {
+                showNotification('Error al cargar oferta', 'error');
+            }
+        }
+
+        function renderOfferModal(offer) {
+            const content = document.getElementById('offerDetailContent');
+            content.innerHTML = `
+                <h2 class="modal-title">${offer.title}</h2>
+                <div class="offer-detail">
+                    <p><strong>Empresa:</strong> ${offer.company_name || 'No especificado'}</p>
+                    <p><strong>Tipo:</strong> <span class="badge badge-${offer.type}">${offer.type}</span></p>
+                    <p><strong>Carrera:</strong> ${offer.career}</p>
+                    <p><strong>Fecha Límite:</strong> ${formatDate(offer.deadline)}</p>
+                    
+                    <h3>Descripción</h3>
+                    <p>${offer.description}</p>
+                    
+                    <h3>Requisitos</h3>
+                    <p>${offer.requirements}</p>
+                    
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="applyToOffer(${offer.id}); closeModal('offerModal')">Aplicar Ahora</button>
+                        <button class="btn btn-secondary" onclick="closeModal('offerModal')">Cerrar</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function loadMyApplications() {
+            try {
+                const status = document.getElementById('applicationStatusFilter').value;
+                let applications = await apiGetStudentApplications(currentUser.id);
+                
+                if (status) {
+                    applications = applications.filter(app => app.status === status);
+                }
+                
+                renderMyApplications(applications);
+            } catch (error) {
+                showNotification('Error al cargar postulaciones', 'error');
+            }
+        }
+
+        function renderMyApplications(applications) {
+            const container = document.getElementById('applicationsContainer');
+            if (applications.length === 0) {
+                container.innerHTML = '<p class="empty-state">No tienes postulaciones</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div class="applications-grid">
+                    ${applications.map(app => `
+                        <div class="application-card">
+                            <div class="application-header">
+                                <h3 class="application-title">${app.offer_title}</h3>
+                                <span class="badge badge-${app.status}">${getStatusLabel(app.status)}</span>
+                            </div>
+                            <div class="application-info">
+                                <p><strong>Empresa:</strong> ${app.company_name}</p>
+                                <p><strong>Fecha de aplicación:</strong> ${formatDate(app.applied_at)}</p>
+                                ${app.assigned_teacher_name ? `
+                                    <p><strong>Profesor asignado:</strong> ${app.assigned_teacher_name}</p>
+                                ` : ''}
+                            </div>
+                            <div class="application-status-info">
+                                ${getStatusMessage(app.status)}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getStatusLabel(status) {
+            const labels = {
+                'pending': 'Pendiente',
+                'company_accepted': 'Empresa Aceptó',
+                'company_rejected': 'Empresa Rechazó',
+                'approved': 'Aprobada',
+                'rejected': 'Rechazada'
+            };
+            return labels[status] || status;
+        }
+
+        function getStatusMessage(status) {
+            const messages = {
+                'pending': '⏳ Tu postulación está siendo revisada por la empresa',
+                'company_accepted': '✅ La empresa te aceptó. Pendiente de aprobación del admin y asignación de profesor',
+                'company_rejected': '❌ La empresa rechazó tu postulación',
+                'approved': '🎉 ¡Felicitaciones! Tu práctica fue aprobada y tienes un profesor asignado',
+                'rejected': '❌ Tu postulación fue rechazada por el administrador'
+            };
+            return `<p class="status-message">${messages[status] || ''}</p>`;
+        }
+
+        function editProfile() {
+            showNotification('Edición de perfil en desarrollo', 'info');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CO');
+        }
+
+        function truncate(text, length) {
+            if (!text) return '';
+            return text.length > length ? text.substring(0, length) + '...' : text;
+        }
+    </script>
+</body>
+</html>

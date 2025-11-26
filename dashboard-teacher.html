@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Profesor - Sistema de Prácticas</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="dashboard-layout">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="assets/logo.png" alt="Logo" class="sidebar-logo">
+                <span class="sidebar-title">Profesor</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#practices" class="sidebar-link active" data-section="practices">
+                    <span class="sidebar-icon">📚</span>
+                    <span>Prácticas Asignadas</span>
+                </a>
+                <a href="#students" class="sidebar-link" data-section="students">
+                    <span class="sidebar-icon">👥</span>
+                    <span>Mis Estudiantes</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <button id="logoutBtn" class="btn btn-text btn-block">Cerrar Sesión</button>
+            </div>
+        </aside>
+
+        <main class="dashboard-main">
+            <header class="dashboard-header">
+                <h1 id="sectionTitle">Prácticas Asignadas</h1>
+                <div class="user-info">
+                    <span id="userName">Profesor</span>
+                    <span class="user-role">Profesor</span>
+                </div>
+            </header>
+
+            <!-- Prácticas Section -->
+            <section id="practicesSection" class="dashboard-section active">
+                <div class="stats-row">
+                    <div class="stat-card-sm">
+                        <div class="stat-label">Total Asignadas</div>
+                        <div class="stat-value" id="totalPractices">0</div>
+                    </div>
+                    <div class="stat-card-sm">
+                        <div class="stat-label">En Curso</div>
+                        <div class="stat-value" id="activePractices">0</div>
+                    </div>
+                    <div class="stat-card-sm">
+                        <div class="stat-label">Completadas</div>
+                        <div class="stat-value" id="completedPractices">0</div>
+                    </div>
+                </div>
+
+                <div id="practicesContainer" class="practices-grid">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+
+            <!-- Estudiantes Section -->
+            <section id="studentsSection" class="dashboard-section">
+                <div id="studentsContainer" class="students-grid">
+                    <!-- Se carga dinámicamente -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Detalle de Práctica -->
+    <div id="practiceModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="modal-close">&times;</span>
+            <div id="practiceDetailContent">
+                <!-- Se carga dinámicamente -->
+            </div>
+        </div>
+    </div>
+
+    <div id="notification"></div>
+
+    <script src="js/mockData.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/applications.js"></script>
+    <script>
+        let currentUser;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeMockData();
+            requireAuth('teacher');
+            
+            currentUser = getCurrentUser();
+            document.getElementById('userName').textContent = currentUser.name;
+            
+            setupNavigation();
+            loadPractices();
+            
+            document.getElementById('logoutBtn').addEventListener('click', logout);
+        });
+
+        function setupNavigation() {
+            const links = document.querySelectorAll('.sidebar-link');
+            links.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = link.dataset.section;
+                    showSection(section);
+                    
+                    links.forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+                });
+            });
+        }
+
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('.dashboard-section');
+            sections.forEach(s => s.classList.remove('active'));
+            
+            const section = document.getElementById(sectionName + 'Section');
+            if (section) {
+                section.classList.add('active');
+                
+                const titles = {
+                    'practices': 'Prácticas Asignadas',
+                    'students': 'Mis Estudiantes'
+                };
+                document.getElementById('sectionTitle').textContent = titles[sectionName];
+                
+                if (sectionName === 'practices') loadPractices();
+                if (sectionName === 'students') loadStudents();
+            }
+        }
+
+        async function loadPractices() {
+            try {
+                // Obtener todas las aplicaciones donde el profesor está asignado
+                const allApplications = JSON.parse(localStorage.getItem('mock_applications') || '[]');
+                const myPractices = allApplications.filter(app => 
+                    app.assigned_teacher_id === currentUser.id && app.status === 'approved'
+                );
+                
+                // Actualizar estadísticas
+                document.getElementById('totalPractices').textContent = myPractices.length;
+                document.getElementById('activePractices').textContent = myPractices.filter(p => !p.completed).length;
+                document.getElementById('completedPractices').textContent = myPractices.filter(p => p.completed).length;
+                
+                renderPractices(myPractices);
+            } catch (error) {
+                showNotification('Error al cargar prácticas', 'error');
+            }
+        }
+
+        function renderPractices(practices) {
+            const container = document.getElementById('practicesContainer');
+            
+            if (practices.length === 0) {
+                container.innerHTML = '<p class="empty-state">No tienes prácticas asignadas aún</p>';
+                return;
+            }
+            
+            container.innerHTML = practices.map(practice => `
+                <div class="practice-card">
+                    <div class="practice-header">
+                        <h3 class="practice-title">${practice.offer_title}</h3>
+                        <span class="badge badge-${practice.completed ? 'completed' : 'active'}">
+                            ${practice.completed ? 'Completada' : 'En Curso'}
+                        </span>
+                    </div>
+                    <div class="practice-info">
+                        <div class="info-row">
+                            <span class="info-label">👤 Estudiante:</span>
+                            <span class="info-value">${practice.student_name}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">🏢 Empresa:</span>
+                            <span class="info-value">${practice.company_name}</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">📅 Inicio:</span>
+                            <span class="info-value">${formatDate(practice.start_date || practice.applied_at)}</span>
+                        </div>
+                        ${practice.profile_snapshot?.career ? `
+                            <div class="info-row">
+                                <span class="info-label">📚 Carrera:</span>
+                                <span class="info-value">${practice.profile_snapshot.career}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div class="practice-actions">
+                        <button class="btn btn-sm btn-primary" onclick="viewPracticeDetail(${practice.id})">
+                            Ver Detalles
+                        </button>
+                        ${!practice.completed ? `
+                            <button class="btn btn-sm btn-secondary" onclick="contactStudent('${practice.profile_snapshot?.email}')">
+                                Contactar
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function viewPracticeDetail(practiceId) {
+            try {
+                const applications = JSON.parse(localStorage.getItem('mock_applications') || '[]');
+                const practice = applications.find(app => app.id === practiceId);
+                
+                if (!practice) {
+                    showNotification('Práctica no encontrada', 'error');
+                    return;
+                }
+                
+                // Obtener datos de la oferta
+                const offers = JSON.parse(localStorage.getItem('mock_offers') || '[]');
+                const offer = offers.find(o => o.id === practice.offer_id);
+                
+                renderPracticeModal(practice, offer);
+                openModal('practiceModal');
+            } catch (error) {
+                showNotification('Error al cargar detalles', 'error');
+            }
+        }
+
+        function renderPracticeModal(practice, offer) {
+            const content = document.getElementById('practiceDetailContent');
+            const student = practice.profile_snapshot || {};
+            
+            content.innerHTML = `
+                <h2 class="modal-title">Detalles de la Práctica</h2>
+                
+                <div class="detail-section">
+                    <h3 class="section-subtitle">Información del Estudiante</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Nombre:</span>
+                            <span class="detail-value">${practice.student_name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">${student.email || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Teléfono:</span>
+                            <span class="detail-value">${student.phone || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Documento:</span>
+                            <span class="detail-value">${student.student_id || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Carrera:</span>
+                            <span class="detail-value">${student.career || '-'}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="detail-section">
+                    <h3 class="section-subtitle">Información de la Oferta</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Título:</span>
+                            <span class="detail-value">${practice.offer_title}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Empresa:</span>
+                            <span class="detail-value">${practice.company_name}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Tipo:</span>
+                            <span class="detail-value">${offer?.type || '-'}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Carrera:</span>
+                            <span class="detail-value">${offer?.career || '-'}</span>
+                        </div>
+                    </div>
+                    
+                    ${offer ? `
+                        <div class="detail-description">
+                            <h4>Descripción:</h4>
+                            <p>${offer.description}</p>
+                        </div>
+                        
+                        <div class="detail-description">
+                            <h4>Requisitos:</h4>
+                            <p>${offer.requirements}</p>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                <div class="detail-section">
+                    <h3 class="section-subtitle">Estado de la Práctica</h3>
+                    <div class="status-info">
+                        <p><strong>Estado:</strong> <span class="badge badge-${practice.completed ? 'completed' : 'active'}">${practice.completed ? 'Completada' : 'En Curso'}</span></p>
+                        <p><strong>Fecha de inicio:</strong> ${formatDate(practice.start_date || practice.applied_at)}</p>
+                        ${practice.completed ? `<p><strong>Fecha de finalización:</strong> ${formatDate(practice.end_date)}</p>` : ''}
+                    </div>
+                </div>
+                
+                <div class="modal-actions">
+                    ${!practice.completed ? `
+                        <button class="btn btn-primary" onclick="contactStudent('${student.email}')">
+                            Contactar Estudiante
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-secondary" onclick="closeModal('practiceModal')">
+                        Cerrar
+                    </button>
+                </div>
+            `;
+        }
+
+        async function loadStudents() {
+            try {
+                const allApplications = JSON.parse(localStorage.getItem('mock_applications') || '[]');
+                const myPractices = allApplications.filter(app => 
+                    app.assigned_teacher_id === currentUser.id && app.status === 'approved'
+                );
+                
+                // Agrupar por estudiante
+                const studentsMap = {};
+                myPractices.forEach(practice => {
+                    if (!studentsMap[practice.student_id]) {
+                        studentsMap[practice.student_id] = {
+                            id: practice.student_id,
+                            name: practice.student_name,
+                            email: practice.profile_snapshot?.email,
+                            phone: practice.profile_snapshot?.phone,
+                            career: practice.profile_snapshot?.career,
+                            practices: []
+                        };
+                    }
+                    studentsMap[practice.student_id].practices.push(practice);
+                });
+                
+                const students = Object.values(studentsMap);
+                renderStudents(students);
+            } catch (error) {
+                showNotification('Error al cargar estudiantes', 'error');
+            }
+        }
+
+        function renderStudents(students) {
+            const container = document.getElementById('studentsContainer');
+            
+            if (students.length === 0) {
+                container.innerHTML = '<p class="empty-state">No tienes estudiantes asignados aún</p>';
+                return;
+            }
+            
+            container.innerHTML = students.map(student => `
+                <div class="student-card">
+                    <div class="student-header">
+                        <div class="student-avatar">👤</div>
+                        <div class="student-info">
+                            <h3 class="student-name">${student.name}</h3>
+                            <p class="student-career">${student.career || 'No especificado'}</p>
+                        </div>
+                    </div>
+                    <div class="student-contact">
+                        <p>📧 ${student.email || '-'}</p>
+                        <p>📱 ${student.phone || '-'}</p>
+                    </div>
+                    <div class="student-stats">
+                        <span class="stat-badge">
+                            📚 ${student.practices.length} práctica${student.practices.length !== 1 ? 's' : ''}
+                        </span>
+                    </div>
+                    <div class="student-practices">
+                        ${student.practices.map(p => `
+                            <div class="mini-practice">
+                                <span>${p.offer_title}</span>
+                                <button class="btn btn-xs btn-secondary" onclick="viewPracticeDetail(${p.id})">Ver</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function contactStudent(email) {
+            if (email) {
+                window.location.href = `mailto:${email}`;
+            } else {
+                showNotification('Email no disponible', 'error');
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-CO');
+        }
+    </script>
+</body>
+</html>
