@@ -287,8 +287,8 @@ section {
 }
 
 .logo-img {
-    width: 40px;
-    height: 40px;
+    width: 170px;
+    height: 170px;
     object-fit: contain;
 }
 
@@ -2779,9 +2779,12 @@ section {
 }
 
 .auth-logo {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto var(--spacing-md);
+    width: 140px;        
+    height: auto;      
+    object-fit: contain;  
+    image-rendering: -webkit-optimize-contrast;
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.25)); 
+    transition: transform .3s ease; 
 }
 
 .auth-title {
@@ -2793,6 +2796,7 @@ section {
 
 .auth-subtitle {
     color: var(--gray-600);
+    margin-top: 20px;
 }
 
 .auth-form {
@@ -2811,6 +2815,7 @@ section {
     margin: var(--spacing-lg) 0;
     color: var(--gray-500);
 }
+
 
 .link {
     color: var(--primary);
@@ -2937,8 +2942,13 @@ section {
 }
 
 .sidebar-logo {
-    width: 40px;
-    height: 40px;
+    width: 140px;         /* Tamaño controlado y uniforme */
+    height: auto;         /* Mantiene proporción correcta */
+    object-fit: contain;  /* Evita que se deforme o se estire */
+    image-rendering: -webkit-optimize-contrast; /* Mejora nitidez */
+    filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.25)); /* Resalta y se ve más profesional */
+    transition: transform .3s ease; /* Animación suave */
+    
 }
 
 .sidebar-title {
