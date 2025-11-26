@@ -15,13 +15,15 @@ function showNotification(message, type = 'info') {
         document.body.appendChild(notif);
         return showNotification(message, type);
     }
-    
     notification.textContent = message;
-    notification.className = `show ${type}`;
-    
+    // Mantener clases base y agregar estado
+    notification.classList.remove('success', 'error', 'warning', 'info');
+    notification.classList.add('show', type);
+
     // Ocultar después de 3 segundos
     setTimeout(() => {
         notification.classList.remove('show');
+        notification.classList.remove(type);
     }, 3000);
 }
 
@@ -275,4 +277,14 @@ function debounce(func, wait) {
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
     };
+}
+
+// Asegurar que las funciones estén disponibles globalmente
+if (typeof window !== 'undefined') {
+    window.formatDate = formatDate;
+    window.showNotification = showNotification;
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.getStatusLabel = getStatusLabel;
+    window.truncateText = truncateText;
 }

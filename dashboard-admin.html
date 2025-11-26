@@ -1,91 +1,331 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Administrador - Sistema de Prácticas</title>
+    <title>Panel de Administración - BlumeApp</title>
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+        // Habilitar modo oscuro si está configurado
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
 </head>
-<body>
-    <div class="dashboard-layout">
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Notificación -->
+    <div id="notification" class="hidden fixed top-4 right-4 p-4 rounded-lg shadow-lg z-50 max-w-sm"></div>
+    
+    <!-- Menú móvil -->
+    <div class="lg:hidden fixed top-4 left-4 z-40">
+        <button id="mobileMenuButton" class="p-2 rounded-md text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700">
+            <i class="fas fa-bars text-xl"></i>
+        </button>
+    </div>
+    <div class="dashboard-layout min-h-screen">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside id="sidebar" class="sidebar transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out" role="navigation" aria-label="Menú lateral">
             <div class="sidebar-header">
-                <img src="assets/logo.png" alt="Logo" class="sidebar-logo">
-                <span class="sidebar-title">Admin Panel</span>
+                <div class="flex items-center space-x-3">
+                    <img src="assets/logo.png" alt="Logo" class="sidebar-logo w-10 h-10">
+                    <div>
+                        <h1 class="sidebar-title text-xl font-bold">BlumeApp</h1>
+                        <div class="mt-3">
+                            <label for="globalSearch" class="sr-only">Buscar</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="fas fa-search text-gray-400"></i>
+                                </div>
+                                <input id="globalSearch" type="text" placeholder="Buscar..." class="search-input form-input pl-10" aria-label="Buscar">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button id="closeSidebar" class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <nav class="sidebar-nav">
-                <a href="#metrics" class="sidebar-link active" data-section="metrics">
-                    <span class="sidebar-icon">📊</span>
+            
+            <nav class="sidebar-nav space-y-1">
+                <a href="#metrics" class="sidebar-link group active" data-section="metrics">
+                    <span class="sidebar-icon group-hover:bg-blue-100 dark:group-hover:bg-blue-900">
+                        <i class="fas fa-chart-line"></i>
+                    </span>
                     <span>Métricas</span>
                 </a>
-                <a href="#users" class="sidebar-link" data-section="users">
-                    <span class="sidebar-icon">👥</span>
+                <a href="#users" class="sidebar-link group" data-section="users">
+                    <span class="sidebar-icon group-hover:bg-blue-100 dark:group-hover:bg-blue-900">
+                        <i class="fas fa-users"></i>
+                    </span>
                     <span>Usuarios</span>
                 </a>
-                <a href="#offers" class="sidebar-link" data-section="offers">
-                    <span class="sidebar-icon">📋</span>
+                <a href="#offers" class="sidebar-link group" data-section="offers">
+                    <span class="sidebar-icon group-hover:bg-blue-100 dark:group-hover:bg-blue-900">
+                        <i class="fas fa-briefcase"></i>
+                    </span>
                     <span>Ofertas</span>
                 </a>
-                <a href="#applications" class="sidebar-link" data-section="applications">
-                    <span class="sidebar-icon">📝</span>
+                <a href="#applications" class="sidebar-link group" data-section="applications">
+                    <span class="sidebar-icon group-hover:bg-blue-100 dark:group-hover:bg-blue-900">
+                        <i class="fas fa-file-alt"></i>
+                    </span>
                     <span>Postulaciones</span>
                 </a>
+                
+                </a>
             </nav>
-            <div class="sidebar-footer">
-                <button id="logoutBtn" class="btn btn-text btn-block">Cerrar Sesión</button>
+            
+            <div class="sidebar-footer mt-auto p-4 border-t border-gray-200 dark:border-gray-700">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center">
+                            <i class="fas fa-user text-blue-600 dark:text-blue-300"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900 dark:text-white" id="userName">Admin</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Administrador</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center" title="Tema">
+                        <label for="themeSelect" class="sr-only">Tema</label>
+                        <select id="themeSelect" class="filter-select" aria-label="Seleccionar tema">
+                            <option value="system">Sistema (predeterminado)</option>
+                            <option value="light">Claro</option>
+                            <option value="dark">Oscuro</option>
+                        </select>
+                    </div>
+                </div>
+                <button id="logoutBtn" class="mt-4 w-full btn btn-outline">
+                    <i class="fas fa-sign-out-alt mr-2"></i> Cerrar Sesión
+                </button>
+                <button id="toggleSidebarCollapse" class="mt-2 w-full btn btn-text" aria-label="Colapsar menú" title="Colapsar menú">
+                    <i class="fas fa-angle-double-left"></i>
+                </button>
             </div>
         </aside>
 
         <!-- Main Content -->
         <main class="dashboard-main">
             <!-- Header -->
-            <header class="dashboard-header">
-                <h1 id="sectionTitle">Panel de Administración</h1>
-                <div class="user-info">
-                    <span id="userName">Admin</span>
-                    <span class="user-role">Administrador</span>
+            <header class="dashboard-header bg-white dark:bg-gray-800 shadow-sm">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-white" id="sectionTitle">Panel de Administración</h1>
+                        <!-- Breadcrumbs removidas para reducir espacio; se muestra sólo el título -->
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <div class="relative">
+                            <!-- Mantener ícono de notificaciones solo (la búsqueda se movió al sidebar) -->
+                            <button id="headerNotifications" class="p-1 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" aria-label="Notificaciones">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-500" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </header>
 
             <!-- Métricas Section -->
-            <section id="metricsSection" class="dashboard-section active">
+            <section id="metricsSection" class="dashboard-section active p-6">
                 <div class="metrics-grid">
-                    <div class="metric-card">
-                        <div class="metric-icon">👥</div>
-                        <div class="metric-value" id="metricUsers">0</div>
-                        <div class="metric-label">Total Usuarios</div>
+                    <!-- Tarjeta de Total de Usuarios -->
+                    <div class="metric-card metric-card-blue">
+                        <div class="metric-icon-wrapper">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-label">Total de Usuarios</h3>
+                            <p class="metric-value" id="metricUsers">0</p>
+                            <p class="metric-change positive">
+                                <i class="fas fa-arrow-up"></i> 12% más
+                            </p>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📋</div>
-                        <div class="metric-value" id="metricOffers">0</div>
-                        <div class="metric-label">Ofertas Pendientes</div>
+
+                    <!-- Tarjeta de Ofertas Pendientes -->
+                    <div class="metric-card metric-card-yellow">
+                        <div class="metric-icon-wrapper">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-label">Ofertas Pendientes</h3>
+                            <p class="metric-value" id="metricOffers">0</p>
+                            <a href="#offers" class="metric-link">
+                                Revisar <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">✅</div>
-                        <div class="metric-value" id="metricPractices">0</div>
-                        <div class="metric-label">Prácticas en Curso</div>
+
+                    <!-- Tarjeta de Prácticas en Curso -->
+                    <div class="metric-card metric-card-green">
+                        <div class="metric-icon-wrapper">
+                            <i class="fas fa-tasks"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-label">Prácticas en Curso</h3>
+                            <p class="metric-value" id="metricPractices">0</p>
+                            <div class="metric-progress">
+                                <div class="metric-progress-bar" style="width: 65%"></div>
+                            </div>
+                            <p class="metric-subtext">65% avance promedio</p>
+                        </div>
                     </div>
-                    <div class="metric-card">
-                        <div class="metric-icon">📝</div>
-                        <div class="metric-value" id="metricApplications">0</div>
-                        <div class="metric-label">Postulaciones Activas</div>
+
+                    <!-- Tarjeta de Postulaciones Activas -->
+                    <div class="metric-card metric-card-purple">
+                        <div class="metric-icon-wrapper">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-label">Postulaciones Activas</h3>
+                            <p class="metric-value" id="metricApplications">0</p>
+                            <a href="#applications" class="metric-link">
+                                Ver más <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <h2 class="card-title">Actividad Reciente</h2>
-                    <div id="recentActivity" class="activity-list">
-                        <!-- Se carga dinámicamente -->
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <!-- Gráfico de Actividad - Ocupa 2/3 del ancho -->
+                    <div class="activity-chart-card lg:col-span-3">
+                        <div class="activity-chart-header">
+                            <div>
+                                <h2 class="activity-chart-title">Actividad General</h2>
+                                <p class="activity-chart-subtitle">Tendencia de actividades en la plataforma</p>
+                            </div>
+                            <div class="chart-filter">
+                                <select class="chart-select">
+                                    <option>Últimos 7 días</option>
+                                    <option>Últimos 30 días</option>
+                                    <option>Este año</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-chart-content">
+                            <div class="chart-placeholder">
+                                <div class="chart-bars">
+                                    <div class="chart-bar" style="height: 60%;"><span>Mon</span></div>
+                                    <div class="chart-bar" style="height: 75%;"><span>Tue</span></div>
+                                    <div class="chart-bar" style="height: 45%;"><span>Wed</span></div>
+                                    <div class="chart-bar" style="height: 85%;"><span>Thu</span></div>
+                                    <div class="chart-bar" style="height: 55%;"><span>Fri</span></div>
+                                    <div class="chart-bar" style="height: 70%;"><span>Sat</span></div>
+                                    <div class="chart-bar" style="height: 50%;"><span>Sun</span></div>
+                                </div>
+                            </div>
+                            
+                            <div class="chart-stats">
+                                <div class="chart-stat">
+                                    <div class="stat-dot" style="background: linear-gradient(135deg, #004D7B, #00B2C1);"></div>
+                                    <div>
+                                        <p class="stat-label">Total de Eventos</p>
+                                        <p class="stat-value">1,234</p>
+                                    </div>
+                                </div>
+                                <div class="chart-stat">
+                                    <div class="stat-dot" style="background: linear-gradient(135deg, #10B981, #22C55E);"></div>
+                                    <div>
+                                        <p class="stat-label">Promedio Diario</p>
+                                        <p class="stat-value">176</p>
+                                    </div>
+                                </div>
+                                <div class="chart-stat">
+                                    <div class="stat-dot" style="background: linear-gradient(135deg, #F59E0B, #FB923C);"></div>
+                                    <div>
+                                        <p class="stat-label">Pico Más Alto</p>
+                                        <p class="stat-value">287</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actividad Reciente - Ocupa 1/3 del ancho -->
+                    <div class="activity-sidebar-card lg:col-span-1">
+                        <div class="activity-sidebar-header">
+                            <h2 class="activity-sidebar-title">Últimas Actividades</h2>
+                            <a href="#" class="activity-sidebar-link">Ver todo</a>
+                        </div>
+                        
+                        <div id="recentActivity" class="activity-sidebar-list">
+                            <!-- Actividad 1 -->
+                            <div class="activity-sidebar-item activity-success">
+                                <div class="activity-sidebar-icon">
+                                    <i class="fas fa-check"></i>
+                                </div>
+                                <div class="activity-sidebar-content">
+                                    <h4 class="activity-sidebar-item-title">Nueva oferta aprobada</h4>
+                                    <p class="activity-sidebar-time">Hace 2 horas</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Actividad 2 -->
+                            <div class="activity-sidebar-item activity-info">
+                                <div class="activity-sidebar-icon">
+                                    <i class="fas fa-user-plus"></i>
+                                </div>
+                                <div class="activity-sidebar-content">
+                                    <h4 class="activity-sidebar-item-title">Nuevo usuario registrado</h4>
+                                    <p class="activity-sidebar-time">Hace 5 horas</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Actividad 3 -->
+                            <div class="activity-sidebar-item activity-warning">
+                                <div class="activity-sidebar-icon">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="activity-sidebar-content">
+                                    <h4 class="activity-sidebar-item-title">Acción requerida</h4>
+                                    <p class="activity-sidebar-time">Hace 1 día</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Actividad 4 -->
+                            <div class="activity-sidebar-item activity-default">
+                                <div class="activity-sidebar-icon">
+                                    <i class="fas fa-file-alt"></i>
+                                </div>
+                                <div class="activity-sidebar-content">
+                                    <h4 class="activity-sidebar-item-title">Nueva postulación</h4>
+                                    <p class="activity-sidebar-time">Ayer</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="activity-sidebar-footer">
+                            <a href="#" class="activity-sidebar-load-more">
+                                Cargar más <i class="fas fa-chevron-down"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </section>
 
             <!-- Usuarios Section -->
             <section id="usersSection" class="dashboard-section">
-                <div class="section-actions">
-                    <input type="text" id="userSearch" class="search-input" placeholder="Buscar usuarios...">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Gestión de Usuarios</h2>
+                        <p class="section-subtitle">Administra todos los usuarios del sistema</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddUserModal()">
+                        <i class="fas fa-plus mr-2"></i>Nuevo Usuario
+                    </button>
+                </div>
+
+                <div class="section-controls">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="userSearch" class="search-box" placeholder="Buscar por nombre, email...">
+                    </div>
                     <select id="roleFilter" class="filter-select">
                         <option value="">Todos los roles</option>
                         <option value="student">Estudiantes</option>
@@ -94,16 +334,16 @@
                     </select>
                 </div>
 
-                <div class="card">
+                <div class="users-card">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-users">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>No.</th>
                                     <th>Nombre</th>
                                     <th>Email</th>
                                     <th>Rol</th>
-                                    <th>Fecha Registro</th>
+                                    <th>Fecha</th>
                                     <th>Acciones</th>
                                 </tr>
                             </thead>
@@ -117,9 +357,23 @@
 
             <!-- Ofertas Section -->
             <section id="offersSection" class="dashboard-section">
-                <div class="section-actions">
-                    <input type="text" id="offerSearch" class="search-input" placeholder="Buscar ofertas...">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Gestión de Ofertas</h2>
+                        <p class="section-subtitle">Revisa y gestiona todas las ofertas de prácticas</p>
+                    </div>
+                    <button class="btn btn-primary" onclick="openAddOfferModal()">
+                        <i class="fas fa-plus mr-2"></i>Nueva Oferta
+                    </button>
+                </div>
+
+                <div class="section-controls">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="offerSearch" class="search-box" placeholder="Buscar por empresa, puesto...">
+                    </div>
                     <select id="offerStatusFilter" class="filter-select">
+                        <option value="">Todos los estados</option>
                         <option value="pending">Pendientes</option>
                         <option value="approved">Aprobadas</option>
                         <option value="rejected">Rechazadas</option>
@@ -133,7 +387,18 @@
 
             <!-- Postulaciones Section -->
             <section id="applicationsSection" class="dashboard-section">
-                <div class="section-actions">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Postulaciones</h2>
+                        <p class="section-subtitle">Gestiona todas las postulaciones a ofertas</p>
+                    </div>
+                </div>
+
+                <div class="section-controls">
+                    <div class="search-box-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="applicationSearch" class="search-box" placeholder="Buscar por estudiante, oferta...">
+                    </div>
                     <select id="applicationStatusFilter" class="filter-select">
                         <option value="">Todos los estados</option>
                         <option value="pending">Pendientes</option>
@@ -144,13 +409,13 @@
                     </select>
                 </div>
 
-                <div class="card">
+                <div class="users-card">
                     <div class="table-responsive">
-                        <table class="table">
+                        <table class="table table-applications">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Estudiante</th>
+                                    <th>NO</th>
+                                    <th>Nombre</th>
                                     <th>Oferta</th>
                                     <th>Empresa</th>
                                     <th>Estado</th>
@@ -169,116 +434,300 @@
     </div>
 
     <!-- Modal Asignar Profesor -->
-    <div id="assignTeacherModal" class="modal">
-        <div class="modal-content">
-            <span class="modal-close">&times;</span>
-            <h2 class="modal-title">Asignar Profesor</h2>
-            <form id="assignTeacherForm">
-                <input type="hidden" id="applicationId">
-                <div class="form-group">
-                    <label class="form-label">Profesor:</label>
-                    <select id="teacherSelect" class="form-input" required>
-                        <option value="">Selecciona un profesor</option>
-                    </select>
+    <div id="assignTeacherModal" class="modal fixed z-50 inset-0 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                <div class="absolute top-0 right-0 pt-4 pr-4">
+                    <button type="button" class="bg-white dark:bg-gray-800 rounded-md text-gray-400 hover:text-gray-500 focus:outline-none" id="closeAssignTeacherModal">
+                        <span class="sr-only">Cerrar</span>
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
-                <div class="modal-actions">
-                    <button type="submit" class="btn btn-primary">Asignar</button>
-                    <button type="button" class="btn btn-secondary" onclick="closeModal('assignTeacherModal')">Cancelar</button>
+                <div>
+                    <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900">
+                        <i class="fas fa-chalkboard-teacher text-blue-600 dark:text-blue-300"></i>
+                    </div>
+                    <div class="mt-3 text-center sm:mt-5">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-white" id="modal-title">
+                            Asignar Profesor
+                        </h3>
+                        <div class="mt-2">
+                            <p class="text-sm text-gray-500 dark:text-gray-400">
+                                Selecciona un profesor para asignar a esta práctica.
+                            </p>
+                        </div>
+                        
+                        <form id="assignTeacherForm" class="mt-4" onsubmit="return false;">
+                            <div class="mb-3">
+                                <label for="teacherSelect" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Profesor</label>
+                                <select id="teacherSelect" aria-label="Seleccionar profesor" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:text-white focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+                                    <option value="">Seleccionar profesor</option>
+                                    <!-- Se llenará dinámicamente -->
+                                </select>
+                                <p class="mt-2 text-sm text-red-600 hidden" id="teacherError" role="alert" aria-live="assertive">Por favor selecciona un profesor.</p>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="assignedDate" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Fecha de asignación</label>
+                                <input type="date" id="assignedDate" class="mt-1 block w-full pl-3 pr-3 py-2 text-base border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" />
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="assignedNotes" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Notas (opcional)</label>
+                                <textarea id="assignedNotes" rows="3" class="mt-1 block w-full pl-3 pr-3 py-2 text-base border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white" placeholder="Comentarios para el profesor o la práctica"></textarea>
+                            </div>
+
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" id="notifyStudent" />
+                                <label for="notifyStudent" class="text-sm text-gray-700 dark:text-gray-300">Notificar al estudiante por correo</label>
+                            </div>
+
+                            <input type="hidden" id="applicationId" value="">
+                        </form>
+                    </div>
                 </div>
-            </form>
+                <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+                    <button type="button" id="confirmAssignTeacher" disabled class="w-full inline-flex justify-center items-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:col-start-2 sm:text-sm">
+                        <span id="confirmAssignText">Asignar</span>
+                        <span id="confirmAssignSpinner" class="ml-2 hidden" aria-hidden="true">⏳</span>
+                    </button>
+                    <button type="button" id="cancelAssignTeacher" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div id="notification"></div>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    
+   <!-- Scripts de la aplicación -->
+<script src="js/api.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/mockData.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/offers.js"></script>
 
-    <script src="js/mockData.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
-    <script src="js/ui.js"></script>
-    <script src="js/offers.js"></script>
-    <script src="js/applications.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            initializeMockData();
-            requireAuth('admin');
+<!-- Script de inicialización -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Inicializar componentes
+        setupMobileMenu();
+        setupDarkMode();
+        setupNavigation();
+        initializeTooltips();
+        setupSidebarCollapse();
+        // Inicializar datos mock si aplica
+        if (typeof initializeMockData === 'function') initializeMockData();
+        
+        // Cargar datos iniciales
+        loadMetrics();
+        loadUsers();
+        loadOffers();
+        loadApplications();
+        // Eventos globales
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) logoutBtn.addEventListener('click', function() { if (typeof logout === 'function') logout(); });
+
+        const confirmAssign = document.getElementById('confirmAssignTeacher');
+        if (confirmAssign) confirmAssign.addEventListener('click', handleAssignTeacher);
+        const cancelAssign = document.getElementById('cancelAssignTeacher');
+        if (cancelAssign) cancelAssign.addEventListener('click', function() { closeModal('assignTeacherModal'); });
+        const assignForm = document.getElementById('assignTeacherForm');
+        if (assignForm) assignForm.addEventListener('submit', handleAssignTeacher);
+    });
+    
+    function setupMobileMenu() {
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const closeSidebar = document.getElementById('closeSidebar');
+            const sidebar = document.getElementById('sidebar');
             
-            const user = getCurrentUser();
-            document.getElementById('userName').textContent = user.name;
+            if (mobileMenuButton) {
+                mobileMenuButton.addEventListener('click', function() {
+                    sidebar.classList.remove('-translate-x-full');
+                    sidebar.classList.add('translate-x-0');
+                });
+            }
             
-            loadMetrics();
-            setupNavigation();
+            if (closeSidebar) {
+                closeSidebar.addEventListener('click', function() {
+                    sidebar.classList.remove('translate-x-0');
+                    sidebar.classList.add('-translate-x-full');
+                });
+            }
             
-            document.getElementById('logoutBtn').addEventListener('click', logout);
-            document.getElementById('userSearch').addEventListener('input', loadUsers);
-            document.getElementById('roleFilter').addEventListener('change', loadUsers);
-            document.getElementById('offerSearch').addEventListener('input', loadOffers);
-            document.getElementById('offerStatusFilter').addEventListener('change', loadOffers);
-            document.getElementById('applicationStatusFilter').addEventListener('change', loadApplications);
-            document.getElementById('assignTeacherForm').addEventListener('submit', handleAssignTeacher);
-        });
+            // Cerrar menú al hacer clic en un enlace en móviles
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.addEventListener('click', function() {
+                    if (window.innerWidth < 1024) {
+                        sidebar.classList.remove('translate-x-0');
+                        sidebar.classList.add('-translate-x-full');
+                    }
+                });
+            });
+        }
+        
+        function applyTheme(theme) {
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            if (theme === 'dark') {
+                document.documentElement.classList.add('dark');
+            } else if (theme === 'light') {
+                document.documentElement.classList.remove('dark');
+            } else { // system
+                if (prefersDark) document.documentElement.classList.add('dark');
+                else document.documentElement.classList.remove('dark');
+            }
+        }
+
+        function setupDarkMode() {
+            const themeSelect = document.getElementById('themeSelect');
+            const stored = localStorage.getItem('theme') || 'system';
+            // set select value
+            if (themeSelect) themeSelect.value = stored;
+
+            // apply initial theme
+            applyTheme(stored);
+
+            // react to user changes
+            if (themeSelect) {
+                themeSelect.addEventListener('change', function() {
+                    const value = this.value;
+                    localStorage.setItem('theme', value);
+                    applyTheme(value);
+                });
+            }
+
+            // if user chose 'system', listen for OS changes and update
+            if (window.matchMedia) {
+                const mql = window.matchMedia('(prefers-color-scheme: dark)');
+                mql.addEventListener ? mql.addEventListener('change', (e) => {
+                    const current = localStorage.getItem('theme') || 'system';
+                    if (current === 'system') applyTheme('system');
+                }) : mql.addListener((e) => {
+                    const current = localStorage.getItem('theme') || 'system';
+                    if (current === 'system') applyTheme('system');
+                });
+            }
+        }
+        
+        function initializeTooltips() {
+            // Inicializar tooltips con tippy.js o similar si es necesario
+        }
+
+        function setupSidebarCollapse() {
+            const toggle = document.getElementById('toggleSidebarCollapse');
+            const sidebar = document.getElementById('sidebar');
+            const layout = document.querySelector('.dashboard-layout');
+            if (!toggle || !sidebar || !layout) return;
+
+            toggle.addEventListener('click', function() {
+                const collapsed = sidebar.classList.toggle('collapsed');
+                layout.classList.toggle('sidebar-collapsed', collapsed);
+                // Actualizar icono y aria
+                const icon = toggle.querySelector('i');
+                if (icon) {
+                    if (collapsed) {
+                        icon.classList.remove('fa-angle-double-left');
+                        icon.classList.add('fa-angle-double-right');
+                        toggle.setAttribute('title', 'Expandir menú');
+                        toggle.setAttribute('aria-label', 'Expandir menú');
+                    } else {
+                        icon.classList.remove('fa-angle-double-right');
+                        icon.classList.add('fa-angle-double-left');
+                        toggle.setAttribute('title', 'Colapsar menú');
+                        toggle.setAttribute('aria-label', 'Colapsar menú');
+                    }
+                }
+            });
+
+            // Atajo de teclado: 'm' para alternar (si no estamos escribiendo)
+            document.addEventListener('keydown', function(e) {
+                const tag = document.activeElement && document.activeElement.tagName;
+                if (e.key === 'm' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+                    toggle.click();
+                }
+            });
+        }
 
         function setupNavigation() {
             const links = document.querySelectorAll('.sidebar-link');
             links.forEach(link => {
-                link.addEventListener('click', (e) => {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const section = link.dataset.section;
+                    const section = this.getAttribute('data-section');
                     showSection(section);
                     
+                    // Actualizar enlace activo
                     links.forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
+                    this.classList.add('active');
+                    
+                    // Actualizar título de sección
+                    const sectionTitle = this.textContent.trim();
+                    const currentEl = document.getElementById('currentSection');
+                    if (currentEl) currentEl.textContent = sectionTitle;
                 });
             });
         }
 
         function showSection(sectionName) {
-            const sections = document.querySelectorAll('.dashboard-section');
-            sections.forEach(s => s.classList.remove('active'));
+            // Ocultar todas las secciones
+            document.querySelectorAll('.dashboard-section').forEach(section => {
+                section.classList.remove('active');
+            });
             
-            const section = document.getElementById(sectionName + 'Section');
-            if (section) {
-                section.classList.add('active');
+            // Mostrar la sección seleccionada con animación
+            const activeSection = document.getElementById(sectionName + 'Section');
+            if (activeSection) {
+                activeSection.classList.add('active');
+                // Agregar animación de entrada
+                activeSection.style.animation = 'fadeIn 0.3s ease';
+            }
+            
+            // Actualizar título de la sección
+            const sectionTitles = {
+                'metrics': 'Métricas',
+                'users': 'Gestión de Usuarios',
+                'offers': 'Ofertas de Práctica',
+                'applications': 'Postulaciones',
                 
-                // Cargar datos de la sección
-                switch(sectionName) {
-                    case 'metrics': loadMetrics(); break;
-                    case 'users': loadUsers(); break;
-                    case 'offers': loadOffers(); break;
-                    case 'applications': loadApplications(); break;
+            };
+            
+            const title = sectionTitles[sectionName] || 'Panel de Administración';
+            document.getElementById('sectionTitle').textContent = title;
+            
+            // Actualizar breadcrumb (si existe en el DOM)
+            const currentSectionEl = document.getElementById('currentSection');
+            if (currentSectionEl) currentSectionEl.textContent = sectionTitles[sectionName] || sectionName;
+            
+            // Desplazarse al inicio de la página
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadMetrics() {
+            // Mostrar esqueleto de carga
+            const metrics = ['Users', 'Offers', 'Practices', 'Applications'];
+            metrics.forEach(metric => {
+                const element = document.getElementById(`metric${metric}`);
+                if (element) {
+                    element.innerHTML = '<div class="placeholder" style="height:48px; border-radius:8px; width:60%; margin:0 auto;"></div>';
                 }
-            }
-        }
-
-        async function loadMetrics() {
-            try {
-                const metrics = await apiGetAdminMetrics();
-                document.getElementById('metricUsers').textContent = metrics.total_users;
-                document.getElementById('metricOffers').textContent = metrics.pending_offers;
-                document.getElementById('metricPractices').textContent = metrics.ongoing_practices;
-                document.getElementById('metricApplications').textContent = metrics.total_applications || 0;
-                
-                renderRecentActivity(metrics.recent_activities);
-            } catch (error) {
-                showNotification('Error al cargar métricas', 'error');
-            }
-        }
-
-        function renderRecentActivity(activities) {
-            const container = document.getElementById('recentActivity');
-            if (!activities || activities.length === 0) {
-                container.innerHTML = '<p class="empty-state">No hay actividad reciente</p>';
-                return;
-            }
+            });
             
-            container.innerHTML = activities.map(activity => `
-                <div class="activity-item">
-                    <div class="activity-icon">${activity.icon || '📝'}</div>
-                    <div class="activity-content">
-                        <div class="activity-text">${activity.text}</div>
-                        <div class="activity-time">${activity.time}</div>
-                    </div>
-                </div>
-            `).join('');
+            // Simular carga de métricas
+            setTimeout(() => {
+                // Actualizar métricas
+                const mu = document.getElementById('metricUsers');
+                const mo = document.getElementById('metricOffers');
+                const mp = document.getElementById('metricPractices');
+                const ma = document.getElementById('metricApplications');
+                if (mu) mu.textContent = '245';
+                if (mo) mo.textContent = '18';
+                if (mp) mp.textContent = '76';
+                if (ma) ma.textContent = '42';
+            }, 800);
         }
 
         async function loadUsers() {
@@ -432,34 +881,94 @@
                 const select = document.getElementById('teacherSelect');
                 select.innerHTML = '<option value="">Selecciona un profesor</option>' + 
                     teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-                
+
                 document.getElementById('applicationId').value = appId;
+
+                // Reset UI state
+                const confirmBtn = document.getElementById('confirmAssignTeacher');
+                const confirmText = document.getElementById('confirmAssignText');
+                const spinner = document.getElementById('confirmAssignSpinner');
+                const teacherError = document.getElementById('teacherError');
+
+                if (confirmBtn) {
+                    confirmBtn.disabled = true;
+                }
+                if (confirmText) confirmText.textContent = 'Asignar';
+                if (spinner) spinner.classList.add('hidden');
+                if (teacherError) teacherError.classList.add('hidden');
+                // Reset additional form fields
+                const assignedDate = document.getElementById('assignedDate');
+                const assignedNotes = document.getElementById('assignedNotes');
+                const notifyStudent = document.getElementById('notifyStudent');
+                if (assignedDate) assignedDate.value = '';
+                if (assignedNotes) assignedNotes.value = '';
+                if (notifyStudent) notifyStudent.checked = false;
+
+                // Enable confirm only when a teacher is selected
+                select.onchange = function() {
+                    if (teacherError) teacherError.classList.add('hidden');
+                    if (confirmBtn) confirmBtn.disabled = !this.value;
+                };
+
                 openModal('assignTeacherModal');
+                // Focus select for faster keyboard flow
+                setTimeout(() => select.focus(), 120);
             } catch (error) {
                 showNotification('Error al cargar profesores', 'error');
             }
         }
 
         async function handleAssignTeacher(e) {
-            e.preventDefault();
+            if (e && e.preventDefault) e.preventDefault();
             const appId = document.getElementById('applicationId').value;
-            const teacherId = document.getElementById('teacherSelect').value;
-            
+            const select = document.getElementById('teacherSelect');
+            const teacherId = select ? select.value : '';
+            const teacherError = document.getElementById('teacherError');
+            const confirmBtn = document.getElementById('confirmAssignTeacher');
+            const confirmText = document.getElementById('confirmAssignText');
+            const spinner = document.getElementById('confirmAssignSpinner');
+
             if (!teacherId) {
-                showNotification('Selecciona un profesor', 'error');
+                if (teacherError) {
+                    teacherError.textContent = 'Por favor selecciona un profesor.';
+                    teacherError.classList.remove('hidden');
+                }
+                if (select) select.focus();
                 return;
             }
-            
+
+            const assignedDateEl = document.getElementById('assignedDate');
+            const assignedNotesEl = document.getElementById('assignedNotes');
+            const notifyEl = document.getElementById('notifyStudent');
+
+            const assignedDateVal = assignedDateEl ? assignedDateEl.value : '';
+            const assignedNotesVal = assignedNotesEl ? assignedNotesEl.value.trim() : '';
+            const notifyVal = notifyEl ? !!notifyEl.checked : false;
+
             try {
+                // UI: show loading
+                if (confirmBtn) confirmBtn.disabled = true;
+                if (confirmText) confirmText.textContent = 'Asignando...';
+                if (spinner) spinner.classList.remove('hidden');
+
                 await apiAdminReviewApplication(appId, {
                     status: 'approved',
-                    assigned_teacher_id: teacherId
+                    assigned_teacher_id: teacherId,
+                    assigned_date: assignedDateVal || null,
+                    admin_notes: assignedNotesVal || null,
+                    notify_student: notifyVal
                 });
+
                 showNotification('Profesor asignado exitosamente', 'success');
                 closeModal('assignTeacherModal');
                 loadApplications();
             } catch (error) {
                 showNotification('Error al asignar profesor', 'error');
+            } finally {
+                // Reset button text and hide spinner; keep disabled until new selection when reopened
+                if (confirmText) confirmText.textContent = 'Asignar';
+                if (spinner) spinner.classList.add('hidden');
+                if (confirmBtn) confirmBtn.disabled = true;
             }
         }
 
