@@ -4689,12 +4689,662 @@ section {
     .card-header-styled {
         padding: var(--spacing-md) var(--spacing-lg);
     }
-    
-    .card-content-styled {
-        padding: var(--spacing-lg);
+}
+
+/* ============================================
+   ESTILOS MEJORADOS PARA EL PERFIL DEL ESTUDIANTE
+   ============================================ */
+
+/* Efecto de gradiente animado */
+@keyframes gradient-x {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.animate-gradient-x {
+    background-size: 200% 200%;
+    animation: gradient-x 15s ease infinite;
+}
+
+/* Encabezado del perfil */
+.profile-header {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.profile-header:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Tarjetas de estadísticas */
+.stat-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.7) !important;
+}
+
+.dark .stat-card {
+    background: rgba(17, 24, 39, 0.5) !important;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Pestañas de navegación */
+.tab-button {
+    position: relative;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--gray-500);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+}
+
+.tab-button:hover {
+    color: var(--primary);
+}
+
+.tab-button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+.tab-button i {
+    margin-right: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Tarjetas de información */
+.info-card {
+    transition: all 0.3s ease;
+    border: 1px solid var(--gray-200);
+    border-radius: 0.75rem;
+    overflow: hidden;
+    background: white;
+}
+
+.dark .info-card {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+.info-card-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex;
+    align-items: center;
+}
+
+.dark .info-card-header {
+    border-bottom-color: var(--gray-700);
+}
+
+.info-card-body {
+    padding: 1.5rem;
+}
+
+/* Sección de habilidades */
+.skill-item {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background: var(--gray-50);
+    transition: all 0.3s ease;
+    border: 1px solid var(--gray-200);
+}
+
+.dark .skill-item {
+    background: var(--gray-800);
+    border-color: var(--gray-700);
+}
+
+.skill-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.skill-progress {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--gray-200);
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.skill-progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+/* Botones de acción */
+.btn-action {
+    width: 32px;
+    height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--gray-600);
+    transition: all 0.2s ease;
+    background: var(--gray-100);
+    border: none;
+    cursor: pointer;
+}
+
+.dark .btn-action {
+    color: var(--gray-300);
+    background: var(--gray-700);
+}
+
+.btn-action:hover {
+    transform: scale(1.1);
+    color: var(--primary);
+}
+
+.btn-action.delete:hover {
+    color: var(--danger);
+}
+
+/* Badges */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35em 0.65em;
+    font-size: 0.75em;
+    font-weight: 600;
+    line-height: 1;
+    color: white;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 0.25rem;
+}
+
+.badge-primary {
+    background-color: var(--primary);
+}
+
+.badge-success {
+    background-color: var(--success);
+}
+
+.badge-warning {
+    background-color: var(--warning);
+}
+
+.badge-danger {
+    background-color: var(--danger);
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .tab-button {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
     }
     
-    .stat-summary {
-        grid-template-columns: 1fr;
+    .info-card-header, .info-card-body {
+        padding: 1rem;
     }
+}
+
+/* ============================================
+   ESTILOS ADICIONALES PARA EL PERFIL DEL ESTUDIANTE
+   ============================================ */
+
+/* Estilos para el encabezado del perfil */
+.profile-header-content {
+    position: relative;
+    padding: 2rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    color: white;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid white;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.profile-name {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.profile-title {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 1.5rem;
+}
+
+/* Tarjetas de estadísticas */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0.5rem 0;
+}
+
+.stat-label {
+    color: var(--gray-600);
+    font-size: 0.9rem;
+}
+
+/* Pestañas de navegación */
+.profile-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--gray-200);
+    margin-bottom: 1.5rem;
+}
+
+.tab-button {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-button.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+/* Contenido de las pestañas */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Estilos para la sección de habilidades */
+.skills-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.skill-card {
+    background: white;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.skill-card:hover {
+    transform: translateY(-3px);
+}
+
+.skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.skill-name {
+    font-weight: 600;
+    color: var(--gray-800);
+}
+
+.skill-level {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+}
+
+.progress-bar {
+    height: 8px;
+    background: var(--gray-100);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 0.5rem;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    border-radius: 4px;
+    transition: width 0.8s ease;
+}
+
+/* Estilos para el modo oscuro */
+.dark .profile-header-content {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-dark) 100%);
+}
+
+.dark .stat-card,
+.dark .skill-card {
+    background: var(--gray-800);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.dark .skill-name {
+    color: var(--gray-100);
+}
+
+.dark .skill-level {
+    color: var(--gray-400);
+}
+
+.dark .progress-bar {
+    background: var(--gray-700);
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Estilos para el botón de editar perfil */
+.edit-profile-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+.edit-profile-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* Estilos para la sección de información personal */
+.personal-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    margin-bottom: 1.5rem;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: var(--gray-800);
+    font-weight: 500;
+}
+
+.dark .info-value {
+    color: var(--gray-200);
+}
+
+/* Estilos para la sección de experiencias */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+    margin-left: 1rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--gray-200);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+    padding-left: 1.5rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -0.5rem;
+    top: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--primary);
+    border: 3px solid white;
+}
+
+.dark .timeline-dot {
+    border-color: var(--gray-800);
+}
+
+.timeline-date {
+    font-size: 0.85rem;
+    color: var(--gray-500);
+    margin-bottom: 0.25rem;
+}
+
+.timeline-title {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: var(--gray-800);
+}
+
+.dark .timeline-title {
+    color: var(--gray-100);
+}
+
+.timeline-company {
+    color: var(--gray-600);
+    font-size: 0.95rem;
+    margin-bottom: 0.5rem;
+}
+
+.dark .timeline-company {
+    color: var(--gray-400);
+}
+
+.timeline-description {
+    font-size: 0.95rem;
+    color: var(--gray-600);
+    line-height: 1.6;
+}
+
+.dark .timeline-description {
+    color: var(--gray-300);
+}
+}
+
+/* ============================================
+   PROFILE - Modern styles for 'Mi Perfil'
+   ============================================ */
+.profile-card {
+    border-radius: 1rem;
+    overflow: visible;
+}
+.profile-card .profile-body {
+    padding-top: 0.75rem; /* reduce heavy spacing from utilities */
+}
+.profile-avatar-wrap {
+    position: relative;
+    width: 144px;
+    min-width: 144px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#profileAvatar {
+    width: 144px;
+    height: 144px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--white);
+    color: var(--gray-400);
+    font-size: 2.25rem;
+    box-shadow: var(--shadow-lg);
+}
+.profile-avatar-edit {
+    right: -6px;
+    bottom: -6px;
+    border: 3px solid var(--white);
+}
+.profile-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.profile-meta h2 {
+    font-size: 1.75rem;
+    margin-bottom: 0.25rem;
+}
+.profile-meta p { margin-bottom: 0.5rem; }
+.profile-badges span { font-weight: 600; font-size: 0.875rem; }
+.profile-actions .btn { padding: 0.5rem 0.9rem; }
+
+/* Compact stats below the profile (reuse existing .stat-card look) */
+.profile-stats {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.profile-stat {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--gray-100);
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+.profile-stat .label { display:block; font-size: 0.8rem; color: var(--gray-500); }
+.profile-stat .value { font-size: 1.25rem; font-weight: 700; color: var(--gray-900); }
+
+/* Dark mode adjustments */
+.dark .profile-card { border-color: rgba(255,255,255,0.06); background: linear-gradient(180deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25)); }
+.dark #profileAvatar { background-color: var(--gray-700); color: var(--white); }
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-avatar-wrap { width: 112px; min-width: 112px; }
+    #profileAvatar { width: 112px; height: 112px; font-size: 1.75rem; }
+    .profile-meta h2 { font-size: 1.25rem; }
+    .profile-actions { margin-top: 0.5rem; }
+    .profile-stats { flex-direction: column; }
+}
+
+@media (max-width: 480px) {
+    .profile-avatar-wrap { width: 96px; min-width: 96px; }
+    #profileAvatar { width: 96px; height: 96px; font-size: 1.25rem; }
+    .profile-meta h2 { font-size: 1.05rem; }
+}
+
+/* Horizontal cards row for profile */
+.profile-cards-row {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    width: 100%;
+}
+.profile-cards-row .card {
+    flex: 1 1 0;
+    min-width: 220px;
+}
+
+@media (max-width: 768px) {
+    .profile-cards-row {
+        flex-direction: column;
+    }
+    .profile-cards-row .card { min-width: 0; }
 }
